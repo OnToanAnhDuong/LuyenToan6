@@ -1,31 +1,49 @@
-import { json } from '@vercel/node';
-import fetch from 'node-fetch';
-
-export default async (req, res) => {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Phương thức không được hỗ trợ' });
+export default async function handler(req, res) {
+    if (req.method !== "POST") {
+        return res.status(405).json({ error: "Only POST method is allowed" });
     }
 
-    const { students } = req.body;
-    if (!students) {
-        return res.status(400).json({ error: 'Thiếu danh sách học sinh' });
+    const { studentId, studentName } = req.body;
+    if (!studentId || !studentName) {
+        return res.status(400).json({ error: "Missing required data" });
     }
 
-    const STUDENTS_JSON_URL = process.env.STUDENTS_JSON_URL;
+    const githubToken = process.env.GITHUB_TOKEN;
+    const repo = "OnToanAnhDuong/LuyenToan6";
+    const filePath = "data/students.json";
+    const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
 
     try {
-        const response = await fetch(STUDENTS_JSON_URL, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(students)
+        const fileResponse = await fetch(apiUrl, {
+            headers: { Authorization: `token ${githubToken}` }
         });
 
-        if (!response.ok) {
-            throw new Error('Lỗi khi lưu danh sách học sinh');
-        }
+        const fileData = await fileResponse.json();
+        const sha = fileData.sha || null;
+        let studentList = fileData.content ? JSON.parse(atob(fileData.content)) : {};
 
-        return res.status(200).json({ message: '✅ Danh sách học sinh đã lưu thành công!' });
+        studentList[studentId] = { studentName };
+
+        const updatedContent = Buffer.from(JSON.stringify(studentList, null, 2)).toString("base64");
+
+        const response = await fetch(apiUrl, {
+            method: "PUT",
+            headers: {
+                Authorization: `token ${githubToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: `Update student list`,
+                content: updatedContent,
+                sha
+            })
+        });
+
+        if (!response.ok) throw new Error("Failed to update student list");
+
+        return res.status(200).json({ message: "Student list updated successfully" });
     } catch (error) {
-        return res.status(500).json({ error: '❌ Không thể lưu danh sách học sinh' });
+        console.error("❌ Error updating student list:", error);
+        return res.status(500).json({ error: "Failed to update student list" });
     }
-};
+}
