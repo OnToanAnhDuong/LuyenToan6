@@ -6,9 +6,11 @@ const API_KEYS = [
     'API_KEY_1', 'API_KEY_2', 'API_KEY_3', 'API_KEY_4', 'API_KEY_5',
     'API_KEY_6', 'API_KEY_7', 'API_KEY_8', 'API_KEY_9', 'API_KEY_10'
 ];
-
-const GITHUB_PROGRESS_URL = 'https://raw.githubusercontent.com/YourRepo/main/progress.json';
-const GITHUB_SAVE_PROGRESS_URL = '/api/save-progress';
+const GET_PROGRESS_URL = "/api/get-progress";
+const SAVE_PROGRESS_URL = "/api/save-progress";
+const GET_STUDENTS_URL = "/api/get-students";
+const SAVE_STUDENTS_URL = "/api/save-students";
+const GET_API_KEYS_URL = "/api/get-api-keys";
 
 let currentKeyIndex = 0;
 let problems = [];
