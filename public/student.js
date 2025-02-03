@@ -1,3 +1,4 @@
+let base64Image = ""; // 🌟 Biến toàn cục để lưu ảnh bài làm
 document.addEventListener("DOMContentLoaded", async function () {
     await initStudentPage();
 });
@@ -143,28 +144,31 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         alert("⚠ Đề bài chưa được tải.");
         return;
     }
-    if (!base64Image && !studentFileInput.files.length) {
-        alert("⚠ Vui lòng tải ảnh bài làm.");
+
+    // 📌 Kiểm tra nếu học sinh đã tải ảnh lên hoặc chụp ảnh từ camera
+    if (!base64Image && studentFileInput.files.length === 0) {
+        alert("⚠ Vui lòng tải lên ảnh bài làm hoặc chụp ảnh từ camera.");
         return;
     }
 
-    // Chuyển ảnh sang Base64
-    const imageToProcess = base64Image || (studentFileInput.files.length > 0 ? await getBase64(studentFileInput.files[0]) : null);
-    if (!imageToProcess) {
-        alert("❌ Không thể lấy ảnh bài làm.");
-        return;
+    // ✅ Nếu chưa có base64Image (chưa chụp từ camera), lấy từ file ảnh
+    if (!base64Image && studentFileInput.files.length > 0) {
+        base64Image = await getBase64(studentFileInput.files[0]);
     }
 
     try {
         document.getElementById("result").innerText = "🔄 Đang chấm bài...";
-        const { studentAnswer, feedback, score } = await gradeWithGemini(imageToProcess, problemText, studentId);
+
+        // 📌 Gửi ảnh và đề bài cho AI chấm bài
+        const { studentAnswer, feedback, score } = await gradeWithGemini(base64Image, problemText, studentId);
         await saveProgress(studentId, score);
 
+        // 📌 Hiển thị kết quả chấm bài
         document.getElementById("result").innerHTML = feedback;
         MathJax.typesetPromise([document.getElementById("result")]).catch(err => console.error("MathJax lỗi:", err));
 
         alert(`✅ Bài tập đã được chấm! Bạn đạt ${score}/10 điểm.`);
-        progressData[currentProblem.index] = true; // Đánh dấu đã làm bài
+        progressData[currentProblem.index] = true; // Đánh dấu bài đã làm
         updateProgressUI();
     } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
