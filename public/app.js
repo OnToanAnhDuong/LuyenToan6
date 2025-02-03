@@ -184,3 +184,54 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     await saveProgress();
     await displayProblemList();
 });
+// 📌 XỬ LÝ SỰ KIỆN ĐĂNG NHẬP
+document.getElementById("loginBtn").addEventListener("click", async () => {
+    const studentId = document.getElementById("studentId").value.trim();
+    
+    if (!studentId) {
+        alert("⚠ Vui lòng nhập mã học sinh.");
+        return;
+    }
+
+    console.log(`🔄 Đang kiểm tra đăng nhập: ${studentId}`);
+
+    try {
+        // Gọi API lấy danh sách học sinh
+        const response = await fetch("/api/get-students");
+        if (!response.ok) {
+            throw new Error("❌ Không thể tải danh sách học sinh.");
+        }
+
+        const students = await response.json();
+        console.log("📌 Danh sách học sinh:", students);
+
+        // Kiểm tra xem ID học sinh có tồn tại không
+        if (!students[studentId]) {
+            alert("❌ Mã học sinh không tồn tại. Vui lòng kiểm tra lại!");
+            return;
+        }
+
+        const studentName = students[studentId].name;
+        const studentRole = students[studentId].role; // Giáo viên hoặc học sinh
+
+        console.log(`✅ Đăng nhập thành công: ${studentName} (${studentRole})`);
+
+        // Lưu ID học sinh vào localStorage để sử dụng sau này
+        localStorage.setItem("studentId", studentId);
+        localStorage.setItem("studentName", studentName);
+        localStorage.setItem("studentRole", studentRole);
+
+        alert(`🎉 Xin chào, ${studentName}! Đăng nhập thành công.`);
+
+        // Chuyển hướng đến giao diện phù hợp
+        if (studentRole === "teacher") {
+            window.location.href = "/teacher-dashboard.html"; // Giao diện giáo viên
+        } else {
+            window.location.href = "/student-dashboard.html"; // Giao diện học sinh
+        }
+    } catch (error) {
+        console.error("❌ Lỗi khi đăng nhập:", error);
+        alert("❌ Đã xảy ra lỗi. Vui lòng thử lại sau.");
+    }
+});
+
