@@ -71,7 +71,7 @@ function displayProblemList(problems) {
     
     problems.forEach(problem => {
         const problemBox = document.createElement("div");
-        problemBox.textContent = `Bài ${problem.index}: ${problem.problem}`;
+        problemBox.textContent = problem.index; // Chỉ hiển thị số bài tập
         problemBox.className = "problem-box";
         problemBox.dataset.id = problem.index;
 
@@ -79,9 +79,9 @@ function displayProblemList(problems) {
         function updateProblemColor() {
             // Kiểm tra nếu progressData đã có dữ liệu trước khi sử dụng
             if (progressData[problem.index]) {
-                problemBox.style.backgroundColor = "green";
+                problemBox.style.backgroundColor = "green"; // Bài đã làm
             } else {
-                problemBox.style.backgroundColor = "yellow";
+                problemBox.style.backgroundColor = "yellow"; // Bài chưa làm
             }
         }
 
@@ -89,7 +89,7 @@ function displayProblemList(problems) {
 
         problemBox.addEventListener("click", async () => {
             if (progressData[problem.index]) {
-                alert("📌 Bài tập này đã làm! Vui lòng chọn bài tập khác.");
+                alert("📌 Bài tập này đã làm! Vui lòng chọn bài tập khác hoặc chọn bài tương tự.");
                 return;
             }
             displayProblem(problem); // Hiển thị nội dung bài tập
@@ -100,12 +100,14 @@ function displayProblemList(problems) {
 
     console.log("✅ Danh sách bài tập đã cập nhật.");
 }
-// 🌟 4. Hiển thị nội dung bài tập
+
+// 🌟 4. Hiển thị nội dung bài tập khi học sinh chọn bài
 function displayProblem(problem) {
-    document.getElementById("problemText").innerHTML = problem.problem;
-    currentProblem = problem;
+    document.getElementById("problemText").innerHTML = problem.problem; // Hiển thị đề bài
+    currentProblem = problem; // Lưu bài tập hiện tại
     MathJax.typesetPromise([document.getElementById("problemText")]).catch(err => console.error("MathJax lỗi:", err));
 }
+
 
 // 🌟 5. Tải tiến trình học sinh từ `progress.json`
 async function loadProgress(studentId) {
