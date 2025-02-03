@@ -1,28 +1,33 @@
-export default async function handler(req, res) {
-    if (req.method !== "GET") {
-        return res.status(405).json({ error: "Only GET method is allowed" });
-    }
+// api/get-progress.js
+const fetch = require('node-fetch');
 
-    const githubToken = process.env.GITHUB_TOKEN;
-    const repo = "OnToanAnhDuong/LuyenToan6";
-    const filePath = "data/progress.json";
-    const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+// Lấy GITHUB_TOKEN từ biến môi trường
+const githubToken = process.env.GITHUB_TOKEN;
+const repo = "OnToanAnhDuong/LuyenToan6";
+const filePath = "data/progress.json";
+const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
 
+async function getProgressData() {
     try {
         const response = await fetch(apiUrl, {
-            headers: { Authorization: `token ${githubToken}` }
+            headers: {
+                'Authorization': `Bearer ${githubToken}`,
+                'Accept': 'application/vnd.github.v3.raw',
+            }
         });
 
         if (!response.ok) {
-            return res.status(404).json({ error: "Progress data not found" });
+            throw new Error('Không thể tải dữ liệu tiến trình từ GitHub');
         }
 
-        const fileData = await response.json();
-        const progressData = JSON.parse(atob(fileData.content));
+        const data = await response.json();
+        const progressData = JSON.parse(atob(data.content));
 
-        return res.status(200).json(progressData);
+        return progressData;
     } catch (error) {
-        console.error("❌ Error loading progress:", error);
-        return res.status(500).json({ error: "Failed to load progress" });
+        console.error('Lỗi khi tải dữ liệu tiến trình:', error);
+        return {};
     }
 }
+
+module.exports = getProgressData;
