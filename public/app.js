@@ -225,9 +225,9 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
 
         // Chuyển hướng đến giao diện phù hợp
         if (studentRole === "teacher") {
-            window.location.href = "/teacher-dashboard.html"; // Giao diện giáo viên
+            window.location.href = "/teacher.html"; // Giao diện giáo viên
         } else {
-            window.location.href = "/student-dashboard.html"; // Giao diện học sinh
+            window.location.href = "student.html"; // Giao diện học sinh
         }
     } catch (error) {
         console.error("❌ Lỗi khi đăng nhập:", error);
