@@ -48,6 +48,9 @@ const loadStudentData = async (studentId) => {
 };
 
 // 🌟 2. Hàm tải danh sách bài tập từ `problems.json`
+let progressData = {};
+
+// 🌟 2. Hàm tải danh sách bài tập từ `problems.json`
 const loadProblems = async () => {
     try {
         const response = await fetch('/api/get-problems');
@@ -61,7 +64,6 @@ const loadProblems = async () => {
         console.error("❌ Lỗi khi tải danh sách bài tập:", error);
     }
 };
-
 // 🌟 3. Hiển thị danh sách bài tập
 function displayProblemList(problems) {
     const problemContainer = document.getElementById("problemList");
@@ -75,7 +77,12 @@ function displayProblemList(problems) {
 
         // Màu sắc trạng thái bài tập
         function updateProblemColor() {
-            problemBox.style.backgroundColor = progressData[problem.index] ? "green" : "yellow";
+            // Kiểm tra nếu progressData đã có dữ liệu trước khi sử dụng
+            if (progressData[problem.index]) {
+                problemBox.style.backgroundColor = "green";
+            } else {
+                problemBox.style.backgroundColor = "yellow";
+            }
         }
 
         updateProblemColor(); // Áp dụng màu sắc
@@ -93,7 +100,6 @@ function displayProblemList(problems) {
 
     console.log("✅ Danh sách bài tập đã cập nhật.");
 }
-
 // 🌟 4. Hiển thị nội dung bài tập
 function displayProblem(problem) {
     document.getElementById("problemText").innerHTML = problem.problem;
