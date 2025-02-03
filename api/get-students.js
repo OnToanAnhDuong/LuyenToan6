@@ -1,28 +1,33 @@
-export default async function handler(req, res) {
-    if (req.method !== "GET") {
-        return res.status(405).json({ error: "Only GET method is allowed" });
-    }
+// api/get-students.js
+const fetch = require('node-fetch');
 
-    const githubToken = process.env.GITHUB_TOKEN;
-    const repo = "OnToanAnhDuong/LuyenToan6";
-    const filePath = "data/students.json";
-    const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+// Lấy GITHUB_TOKEN từ biến môi trường
+const githubToken = process.env.GITHUB_TOKEN;
+const repo = "OnToanAnhDuong/LuyenToan6";
+const filePath = "data/students.json";
+const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
 
+async function getStudentsData() {
     try {
         const response = await fetch(apiUrl, {
-            headers: { Authorization: `token ${githubToken}` }
+            headers: {
+                'Authorization': `Bearer ${githubToken}`,
+                'Accept': 'application/vnd.github.v3.raw',  // Đảm bảo trả về nội dung raw
+            }
         });
 
         if (!response.ok) {
-            return res.status(404).json({ error: "Student data not found" });
+            throw new Error('Không thể tải dữ liệu học sinh từ GitHub');
         }
 
-        const fileData = await response.json();
-        const studentData = JSON.parse(atob(fileData.content));
+        const data = await response.json();
+        const students = JSON.parse(atob(data.content));  // Giải mã nội dung base64
 
-        return res.status(200).json(studentData);
+        return students;
     } catch (error) {
-        console.error("❌ Error loading student data:", error);
-        return res.status(500).json({ error: "Failed to load student data" });
+        console.error('Lỗi khi tải dữ liệu học sinh:', error);
+        return {};
     }
 }
+
+module.exports = getStudentsData;
