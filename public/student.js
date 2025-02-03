@@ -35,15 +35,18 @@ async function loadStudentData(studentId) {
 }
 
 // 🌟 2. Hàm tải danh sách bài tập từ `problems.json`
-async function loadProblems() {
+const loadProblems = async () => {
     try {
-        const response = await fetch("/api/get-problems");
+        const response = await fetch('/api/get-problems');
+        if (!response.ok) {
+            throw new Error("Không thể tải danh sách bài tập!");
+        }
         const problems = await response.json();
-        displayProblemList(problems);
+        console.log("✅ Danh sách bài tập:", problems);
     } catch (error) {
         console.error("❌ Lỗi khi tải danh sách bài tập:", error);
     }
-}
+};
 
 // 🌟 3. Hiển thị danh sách bài tập
 function displayProblemList(problems) {
