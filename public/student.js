@@ -18,21 +18,29 @@ async function initStudentPage() {
 }
 
 // 🌟 1. Hàm tải dữ liệu học sinh từ `students.json`
-async function loadStudentData(studentId) {
+const loadStudentData = async () => {
     try {
-        const response = await fetch("/api/get-students");
+        const response = await fetch('/api/get-students');
         const students = await response.json();
-        const student = students.find(s => s.studentId === studentId);
-        if (!student) {
-            alert("⚠ Không tìm thấy dữ liệu học sinh!");
-            window.location.href = "index.html";
-            return;
+        
+        console.log("✅ Danh sách học sinh:", students);
+
+        // Kiểm tra kiểu dữ liệu của students
+        if (Array.isArray(students)) {
+            const studentData = students.find(student => student.studentId === studentId);
+            if (studentData) {
+                // Tiến hành xử lý tiếp
+            } else {
+                console.error("❌ Không tìm thấy học sinh với ID:", studentId);
+            }
+        } else {
+            console.error("❌ Dữ liệu học sinh không phải là mảng!");
         }
-        document.getElementById("studentName").textContent = student.name;
     } catch (error) {
         console.error("❌ Lỗi khi tải danh sách học sinh:", error);
     }
-}
+};
+
 
 // 🌟 2. Hàm tải danh sách bài tập từ `problems.json`
 const loadProblems = async () => {
