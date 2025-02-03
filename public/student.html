@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>ÔN LUYỆN TOÁN THCS - TRUNG TÂM ÁNH DƯƠNG</title>
+    <title>ÔN LUYỆN TOÁN THCS - HỌC SINH</title>
     <link rel="stylesheet" href="style.css"> <!-- Kết nối CSS -->
 
     <!-- Thêm MathJax -->
@@ -23,14 +23,10 @@
     </script>
 </head>
 <body>
-    <h1>ÔN LUYỆN TOÁN THCS - TRUNG TÂM ÁNH DƯƠNG</h1>    
+    <h1>ÔN LUYỆN TOÁN THCS - HỌC SINH</h1>    
 
-    <div id="loginContainer">
-        <input type="text" id="studentId" placeholder="Nhập mã học sinh">
-        <button id="loginBtn">Đăng nhập</button>
-    </div>
-
-    <div id="mainContent" style="display: none;">
+    <!-- Hiển thị danh sách bài tập -->
+    <div id="mainContent">
         <h2>Danh sách bài tập</h2>
         <div id="problemList" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
 
@@ -39,8 +35,7 @@
             <input type="number" id="problemIndexInput" placeholder="Nhập số thứ tự (1, 2, ...)" />
             <button id="selectProblemBtn">Hiển thị bài tập</button>
             <button id="randomProblemBtn">Lấy bài tập ngẫu nhiên</button>
-            <button id="similarProblemBtn">Tạo bài tập tương tự</button>
-            <div id="progressContainer" style="display: none;">
+            <div id="progressContainer">
                 <p>Số bài: <span id="completedExercises">0</span> | Điểm TB: <span id="averageScore">0</span></p>
             </div>
         </div>
