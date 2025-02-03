@@ -1,3 +1,26 @@
+/* Thêm Google Fonts cho hỗ trợ tiếng Việt */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Hoặc bạn có thể chọn một font khác như Noto Sans */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Vietnamese:wght@400;500&display=swap');
+
+* {
+    font-family: 'Roboto', sans-serif;  /* Đặt font mặc định cho toàn bộ trang */
+    line-height: 1.6;   /* Tăng khoảng cách giữa các dòng cho dễ đọc */
+}
+
+/* Cấu hình cho các phần tiêu đề, nội dung */
+h1, h2, h3, h4 {
+    font-weight: 700;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
 /* Tổng thể trang */
 body {
     font-family: Arial, sans-serif;
