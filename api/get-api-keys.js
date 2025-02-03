@@ -1,14 +1,23 @@
-import { json } from '@vercel/node';
-
-export default async (req, res) => {
-    const API_KEYS = [
-        process.env.API_K1, process.env.API_K2, process.env.API_K3, process.env.API_K4, process.env.API_K5,
-        process.env.API_K6, process.env.API_K7, process.env.API_K8, process.env.API_K9, process.env.API_K10
-    ].filter(Boolean);
-
-    if (API_KEYS.length === 0) {
-        return res.status(500).json({ error: '❌ Không tìm thấy API Keys' });
+export default async function handler(req, res) {
+    if (req.method !== "GET") {
+        return res.status(405).json({ error: "Only GET method is allowed" });
     }
 
-    return res.status(200).json({ apiKeys: API_KEYS });
-};
+    try {
+        const apiKeys = [
+            process.env.API_K1, process.env.API_K2, process.env.API_K3,
+            process.env.API_K4, process.env.API_K5, process.env.API_K6,
+            process.env.API_K7, process.env.API_K8, process.env.API_K9,
+            process.env.API_K10
+        ].filter(key => key); // Lọc ra các API Key hợp lệ
+
+        if (apiKeys.length === 0) {
+            return res.status(500).json({ error: "No API keys available" });
+        }
+
+        return res.status(200).json({ apiKeys });
+    } catch (error) {
+        console.error("❌ Error retrieving API keys:", error);
+        return res.status(500).json({ error: "Failed to retrieve API keys" });
+    }
+}
