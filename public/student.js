@@ -144,3 +144,84 @@ async function saveProgress(progressData) {
         console.error("❌ Lỗi khi lưu tiến trình:", error);
     }
 }
+document.addEventListener('DOMContentLoaded', function() {
+    // Các biến DOM
+    const selectProblemBtn = document.getElementById('selectProblemBtn');
+    const randomProblemBtn = document.getElementById('randomProblemBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const hintBtn = document.getElementById('hintBtn');
+    const deleteAllBtn = document.getElementById('deleteAllBtn');
+    const problemIndexInput = document.getElementById('problemIndexInput');
+    const problemText = document.getElementById('problemText');
+    const problemList = document.getElementById('problemList');
+    const result = document.getElementById('result');
+    const completedExercises = document.getElementById('completedExercises');
+    const averageScore = document.getElementById('averageScore');
+    
+    // Mảng chứa các bài tập mẫu
+    const problems = [
+        { id: 1, question: "Tính 5 + 3 * 2" },
+        { id: 2, question: "Giải phương trình 3x + 4 = 10" },
+        { id: 3, question: "Tính diện tích hình chữ nhật với chiều dài 8cm và chiều rộng 5cm" },
+    ];
+
+    // Chọn bài theo số thứ tự
+    selectProblemBtn.addEventListener('click', function() {
+        const index = parseInt(problemIndexInput.value, 10);
+        if (index && index <= problems.length) {
+            const selectedProblem = problems[index - 1];
+            problemText.innerHTML = selectedProblem.question;
+        } else {
+            alert('Số bài không hợp lệ!');
+        }
+    });
+
+    // Lấy bài tập ngẫu nhiên
+    randomProblemBtn.addEventListener('click', function() {
+        const randomIndex = Math.floor(Math.random() * problems.length);
+        const randomProblem = problems[randomIndex];
+        problemText.innerHTML = randomProblem.question;
+    });
+
+    // Chấm bài
+    submitBtn.addEventListener('click', function() {
+        // Giả sử bạn có kết quả tính toán ở đây
+        const score = Math.floor(Math.random() * 10); // Điểm ngẫu nhiên từ 0 đến 10
+        result.innerHTML = `Điểm: ${score}/10`;
+
+        // Cập nhật số bài đã làm và điểm trung bình
+        let completed = parseInt(completedExercises.textContent, 10);
+        let avgScore = parseFloat(averageScore.textContent);
+        completed++;
+        avgScore = (avgScore * (completed - 1) + score) / completed;
+
+        completedExercises.textContent = completed;
+        averageScore.textContent = avgScore.toFixed(2);
+    });
+
+    // Gợi ý
+    hintBtn.addEventListener('click', function() {
+        alert('Gợi ý: Hãy áp dụng quy tắc ưu tiên trong phép tính!');
+    });
+
+    // Xóa tất cả
+    deleteAllBtn.addEventListener('click', function() {
+        problemIndexInput.value = '';
+        problemText.innerHTML = '';
+        result.innerHTML = '';
+        completedExercises.textContent = 0;
+        averageScore.textContent = 0;
+    });
+
+    // Hiển thị danh sách bài tập trên trang học sinh
+    problems.forEach(function(problem) {
+        const problemBox = document.createElement('div');
+        problemBox.classList.add('problem-box');
+        problemBox.textContent = problem.question;
+        problemBox.addEventListener('click', function() {
+            problemText.innerHTML = problem.question;
+        });
+        problemList.appendChild(problemBox);
+    });
+});
+
