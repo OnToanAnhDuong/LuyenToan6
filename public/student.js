@@ -24,17 +24,26 @@ const loadStudentData = async () => {
         if (!response.ok) {
             throw new Error("Không thể tải danh sách học sinh.");
         }
-        const students = await response.json();
-        
-        // Kiểm tra xem dữ liệu có phải là mảng không
-        if (!Array.isArray(students)) {
-            throw new Error("Dữ liệu học sinh không phải là mảng!");
+        const studentsObject = await response.json();  // Lấy dữ liệu từ API
+
+        // Chuyển đối tượng JSON thành mảng
+        const students = Object.keys(studentsObject).map(key => ({
+            id: key, 
+            name: studentsObject[key].name,
+            role: studentsObject[key].role
+        }));
+
+        console.log("✅ Danh sách học sinh:", students);
+
+        // Kiểm tra xem danh sách có hợp lệ không
+        if (!Array.isArray(students) || students.length === 0) {
+            throw new Error("Dữ liệu học sinh không phải là mảng hoặc rỗng!");
         }
-        
-        console.log("✅ Dữ liệu học sinh:", students);
-        // Tiếp tục xử lý dữ liệu học sinh ở đây
+
+        return students; // Trả về danh sách học sinh đã chuyển đổi
     } catch (error) {
         console.error("❌ Lỗi khi tải danh sách học sinh:", error);
+        return [];  // Trả về mảng rỗng để tránh lỗi khi xử lý tiếp
     }
 };
 
