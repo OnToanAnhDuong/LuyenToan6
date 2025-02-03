@@ -1,3 +1,5 @@
+const API_KEYS = ['API_K1', 'API_K2', 'API_K3', 'API_K4', 'API_K5'];  // Thêm các API key của bạn vào đây.
+let currentKeyIndex = 0;  // Biến để theo dõi API key đang sử dụng
 let base64Image = ""; // 🌟 Biến toàn cục để lưu ảnh bài làm
 document.addEventListener("DOMContentLoaded", async function () {
     await initStudentPage();
@@ -208,6 +210,12 @@ function getBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
+// Hàm lấy API key tiếp theo từ danh sách
+function getNextApiKey() {
+    const apiKey = API_KEYS[currentKeyIndex];
+    currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;  // Lấy API key tiếp theo theo chu kỳ
+    return apiKey;
+}
 async function gradeWithGemini(base64Image, problemText, studentId) {
     const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-002:generateContent';
     const promptText = `
@@ -237,7 +245,7 @@ async function gradeWithGemini(base64Image, problemText, studentId) {
     };
 
     try {
-        const response = await fetch(`${apiUrl}?key=${getNextApiKey()}`, {
+        const response = await fetch(`${apiUrl}?key=${getNextApiKey()}`, {  // Gọi hàm lấy API key
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(requestBody)
@@ -260,3 +268,5 @@ async function gradeWithGemini(base64Image, problemText, studentId) {
         return { studentAnswer: '', feedback: `Đã xảy ra lỗi: ${error.message}`, score: 0 };
     }
 }
+
+
