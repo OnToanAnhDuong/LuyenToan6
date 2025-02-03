@@ -10,6 +10,7 @@ export default async function handler(req, res) {
     try {
         console.log(`📥 Đang lấy tiến trình của học sinh ${studentId} từ GitHub...`);
 
+        // Lấy dữ liệu tiến trình từ GitHub
         const response = await fetch(GITHUB_PROGRESS_URL);
         if (!response.ok) {
             throw new Error(`❌ Lỗi khi lấy dữ liệu từ GitHub: ${response.statusText}`);
@@ -17,8 +18,9 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        if (!data || !data[studentId]) {
-            return res.status(404).json({ message: "❌ Không tìm thấy tiến trình của học sinh." });
+        // Kiểm tra nếu không có dữ liệu cho studentId trong progress.json
+        if (!data[studentId]) {
+            return res.status(404).json({ message: `❌ Không tìm thấy tiến trình cho học sinh ${studentId}.` });
         }
 
         console.log(`✅ Tiến trình của học sinh ${studentId}:`, data[studentId]);
