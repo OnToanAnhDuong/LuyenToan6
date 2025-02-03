@@ -1,33 +1,18 @@
-// api/get-progress.js
-const fetch = require('node-fetch');
+export default async function handler(req, res) {
+    const { studentId } = req.query;
+    if (!studentId) {
+        return res.status(400).json({ message: 'Thiếu studentId' });
+    }
 
-// Lấy GITHUB_TOKEN từ biến môi trường
-const githubToken = process.env.GITHUB_TOKEN;
-const repo = "OnToanAnhDuong/LuyenToan6";
-const filePath = "data/progress.json";
-const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
-
-async function getProgressData() {
     try {
-        const response = await fetch(apiUrl, {
-            headers: {
-                'Authorization': `Bearer ${githubToken}`,
-                'Accept': 'application/vnd.github.v3.raw',
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Không thể tải dữ liệu tiến trình từ GitHub');
+        // Giả sử bạn lấy dữ liệu tiến trình từ một nguồn (ví dụ file JSON, database, v.v...)
+        const progress = await getStudentProgress(studentId);  // Giả sử là hàm lấy dữ liệu tiến trình
+        if (!progress) {
+            return res.status(404).json({ message: 'Không tìm thấy tiến trình của học sinh.' });
         }
-
-        const data = await response.json();
-        const progressData = JSON.parse(atob(data.content));
-
-        return progressData;
+        res.status(200).json(progress);
     } catch (error) {
-        console.error('Lỗi khi tải dữ liệu tiến trình:', error);
-        return {};
+        console.error("Lỗi khi lấy tiến trình học sinh:", error);
+        res.status(500).json({ message: 'Lỗi hệ thống khi lấy tiến trình học sinh.' });
     }
 }
-
-module.exports = getProgressData;
