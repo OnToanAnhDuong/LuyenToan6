@@ -208,3 +208,55 @@ function getBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
+async function gradeWithGemini(base64Image, problemText, studentId) {
+    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-002:generateContent';
+    const promptText = `
+    Học sinh: ${studentId}
+    Đề bài:
+    ${problemText}
+    
+    Hãy thực hiện các bước sau:
+    1. Nhận diện và gõ lại bài làm từ hình ảnh (định dạng Toán học giữ nguyên).
+    2. Giải bài toán đúng theo chương trình lớp 6.
+    3. So sánh bài làm học sinh với đáp án đúng.
+    4. Chấm điểm từ 0 đến 10.
+    5. Đưa ra nhận xét cải thiện.
+
+    Trả về kết quả theo định dạng:
+    - **Bài làm của học sinh:** [...]
+    - **Lời giải chi tiết:** [...]
+    - **Chấm điểm:** [...]
+    - **Điểm số:** [...]
+    - **Nhận xét:** [...]
+    `;
+
+    const requestBody = {
+        contents: [
+            { parts: [{ text: promptText }, { inline_data: { mime_type: "image/jpeg", data: base64Image } }] }
+        ]
+    };
+
+    try {
+        const response = await fetch(`${apiUrl}?key=${getNextApiKey()}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+        const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!responseText) {
+            throw new Error("Không nhận được phản hồi hợp lệ từ AI.");
+        }
+
+        const studentAnswer = responseText.match(/Bài làm của học sinh: ([\s\S]*?)(?=\nLời giải chi tiết:)/)?.[1]?.trim() || '';
+        const feedback = responseText.replace(/Bài làm của học sinh: [\s\S]*?\n/, '');
+        const score = parseFloat(responseText.match(/Điểm số: (\d+(\.\d+)?)/)?.[1] || '0');
+
+        return { studentAnswer, feedback, score };
+    } catch (error) {
+        console.error("❌ Lỗi chấm bài với Gemini:", error);
+        return { studentAnswer: '', feedback: `Đã xảy ra lỗi: ${error.message}`, score: 0 };
+    }
+}
