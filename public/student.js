@@ -18,7 +18,7 @@ async function initStudentPage() {
 }
 
 // 🌟 1. Hàm tải dữ liệu học sinh từ `students.json`
-const loadStudentData = async () => {
+const loadStudentData = async (studentId) => {
     try {
         const response = await fetch('/api/get-students');
         if (!response.ok) {
@@ -28,7 +28,7 @@ const loadStudentData = async () => {
 
         // Chuyển đối tượng JSON thành mảng
         const students = Object.keys(studentsObject).map(key => ({
-            id: key, 
+            id: key,
             name: studentsObject[key].name,
             role: studentsObject[key].role
         }));
@@ -47,7 +47,6 @@ const loadStudentData = async () => {
     }
 };
 
-
 // 🌟 2. Hàm tải danh sách bài tập từ `problems.json`
 const loadProblems = async () => {
     try {
@@ -57,6 +56,7 @@ const loadProblems = async () => {
         }
         const problems = await response.json();
         console.log("✅ Danh sách bài tập:", problems);
+        displayProblemList(problems); // Hiển thị bài tập lên giao diện
     } catch (error) {
         console.error("❌ Lỗi khi tải danh sách bài tập:", error);
     }
@@ -65,27 +65,27 @@ const loadProblems = async () => {
 // 🌟 3. Hiển thị danh sách bài tập
 function displayProblemList(problems) {
     const problemContainer = document.getElementById("problemList");
-    problemContainer.innerHTML = "";
+    problemContainer.innerHTML = ""; // Xóa danh sách cũ nếu có
     
     problems.forEach(problem => {
         const problemBox = document.createElement("div");
-        problemBox.textContent = `Bài ${problem.id}`;
+        problemBox.textContent = `Bài ${problem.index}: ${problem.problem}`;
         problemBox.className = "problem-box";
-        problemBox.dataset.id = problem.id;
+        problemBox.dataset.id = problem.index;
 
         // Màu sắc trạng thái bài tập
         function updateProblemColor() {
-            problemBox.style.backgroundColor = progressData[problem.id] ? "green" : "yellow";
+            problemBox.style.backgroundColor = progressData[problem.index] ? "green" : "yellow";
         }
 
         updateProblemColor(); // Áp dụng màu sắc
 
         problemBox.addEventListener("click", async () => {
-            if (progressData[problem.id]) {
+            if (progressData[problem.index]) {
                 alert("📌 Bài tập này đã làm! Vui lòng chọn bài tập khác.");
                 return;
             }
-            displayProblem(problem);
+            displayProblem(problem); // Hiển thị nội dung bài tập
         });
 
         problemContainer.appendChild(problemBox);
@@ -96,7 +96,7 @@ function displayProblemList(problems) {
 
 // 🌟 4. Hiển thị nội dung bài tập
 function displayProblem(problem) {
-    document.getElementById("problemText").innerHTML = problem.question;
+    document.getElementById("problemText").innerHTML = problem.problem;
     currentProblem = problem;
     MathJax.typesetPromise([document.getElementById("problemText")]).catch(err => console.error("MathJax lỗi:", err));
 }
@@ -156,7 +156,7 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         MathJax.typesetPromise([document.getElementById("result")]).catch(err => console.error("MathJax lỗi:", err));
 
         alert(`✅ Bài tập đã được chấm! Bạn đạt ${score}/10 điểm.`);
-        progressData[currentProblem.id] = true; // Đánh dấu đã làm bài
+        progressData[currentProblem.index] = true; // Đánh dấu đã làm bài
         updateProgressUI();
     } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
