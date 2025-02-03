@@ -46,6 +46,213 @@ button:hover {
     cursor: pointer;
     font-weight: bold;
 }
+/* 🌟 Tổng thể trang */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    padding: 20px;
+}
+
+/* 🏷️ Tiêu đề */
+h1 {
+    color: #2c3e50;
+}
+
+/* 📦 Container đăng nhập */
+#loginContainer {
+    background: white;
+    padding: 15px;
+    width: 300px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 📌 Ô nhập mã học sinh */
+#studentId {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 🔘 Nút đăng nhập */
+#loginBtn {
+    background: #3498db;
+    color: white;
+    padding: 10px;
+    border: none;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#loginBtn:hover {
+    background: #2980b9;
+}
+
+/* 📑 Danh sách bài tập */
+#problemList {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+/* 📌 Ô bài tập */
+.problem-box {
+    padding: 15px;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* 🟡 Màu nền cho bài tập */
+.problem-box.yellow {
+    background: #f1c40f; /* Bài chưa làm */
+    color: black;
+}
+
+.problem-box.green {
+    background: #2ecc71; /* Bài đã làm */
+    color: white;
+}
+
+.problem-box.blue {
+    background: #3498db; /* Bài đang làm */
+    color: white;
+}
+
+/* 🎯 Điều chỉnh phần nhập số bài */
+#topControls {
+    margin: 20px 0;
+}
+
+#problemIndexInput {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* 🔘 Nút chọn bài */
+#selectProblemBtn {
+    background: #9b59b6;
+    color: white;
+}
+
+#randomProblemBtn {
+    background: #1abc9c;
+    color: white;
+}
+
+#similarProblemBtn {
+    background: #e67e22;
+    color: white;
+}
+
+/* 📌 Khung đề bài */
+#problemContainer {
+    background: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 📑 Kết quả chấm bài */
+#result {
+    background: #ecf0f1;
+    padding: 15px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* 📷 Phần chụp ảnh */
+#cameraAndImageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* 📸 Camera và ảnh bài làm */
+#videoContainer, #imageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+video {
+    border: 2px solid #2c3e50;
+    border-radius: 5px;
+}
+
+/* 🎨 Tùy chỉnh ảnh chụp */
+img {
+    border: 2px solid #2c3e50;
+    border-radius: 5px;
+    margin-top: 10px;
+    max-width: 100%;
+}
+
+/* 📦 Hộp thông báo */
+.message-box-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.message-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.message-box button {
+    background: #e74c3c;
+    color: white;
+    padding: 10px;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+}
 
 /* Trạng thái bài tập */
 .problem-box.yellow { background-color: yellow; }
