@@ -1,11 +1,11 @@
 [
     {
-        "studentId": "student001",
+        "studentId": "HS001",
         "completedExercises": 5,
         "averageScore": 7.5
     },
     {
-        "studentId": "student002",
+        "studentId": "HS002",
         "completedExercises": 3,
         "averageScore": 6.0
     }
