@@ -1,7 +1,7 @@
 {
   "name": "LuyenToan6",
   "version": "1.0.0",
-  "type": "module",  // Thêm dòng này vào để sử dụng ESM
+  "type": "module",  
   "dependencies": {
     "@octokit/rest": "^19.0.0"
   }
