@@ -1,5 +1,5 @@
 // Import API keys từ get-api-keys.js
-const apiKeys = require('../api/get-api-keys');  // Đảm bảo đường dẫn đúng với cấu trúc dự án của bạn
+const apiKeys = require('/api/get-api-keys');  // Đảm bảo đường dẫn đúng với cấu trúc dự án của bạn
 
 let currentKeyIndex = 0;  // Biến để theo dõi API key đang sử dụng
 
