@@ -1,16 +1,7 @@
-// Lấy các API keys từ biến môi trường
-const apiKeys = [
-    process.env.API_K1,
-    process.env.API_K2,
-    process.env.API_K3,
-    process.env.API_K4,
-    process.env.API_K5,
-    process.env.API_K6,
-    process.env.API_K7,
-    process.env.API_K8,
-    process.env.API_K9,
-    process.env.API_K10
-].filter(key => key);  // Lọc ra các API keys hợp lệ (không null, undefined)
+// Import API keys từ get-api-keys.js
+const apiKeys = require('./api/get-api-keys');  // Đảm bảo đường dẫn đúng với cấu trúc dự án của bạn
+
+let currentKeyIndex = 0;  // Biến để theo dõi API key đang sử dụng
 
 // Kiểm tra xem có API keys hợp lệ không
 if (apiKeys.length === 0) {
@@ -18,12 +9,6 @@ if (apiKeys.length === 0) {
 } else {
     console.log(`Có ${apiKeys.length} API keys hợp lệ.`);
 }
-
-let currentKeyIndex = 0;  // Biến để theo dõi API key đang sử dụng
-
-// Sử dụng API key trong các yêu cầu API
-const apiKey = getNextApiKey();
-console.log("Đang sử dụng API Key:", apiKey);
 let base64Image = ""; // 🌟 Biến toàn cục để lưu ảnh bài làm
 document.addEventListener("DOMContentLoaded", async function () {
     await initStudentPage();
