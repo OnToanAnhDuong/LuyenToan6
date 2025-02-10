@@ -2,7 +2,7 @@
 import { Octokit } from "octokit";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Token GitHub từ biến môi trường
-const REPO_OWNER = "ToanTHCS"; // Chủ sở hữu repository
+const REPO_OWNER = "OnToanAnhDuong"; // Chủ sở hữu repository
 const REPO_NAME = "LuyenToan6"; // Tên repository
 const FILE_PATH = "data/progress.json"; // Đường dẫn file JSON trên GitHub
 
