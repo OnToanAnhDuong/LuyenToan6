@@ -53,5 +53,4 @@ function updateProgressUI() {
     document.getElementById("completedExercises").textContent = progressData.completedExercises || 0;
     document.getElementById("averageScore").textContent = progressData.averageScore?.toFixed(2) || 0;
 }
-export async function loadProgress(studentId) { ... }
-export async function saveProgress(studentId, score) { ... }
+
