@@ -145,19 +145,17 @@ function updateProgressUI() {
 // Lưu tiến trình học sinh vào `progress.json`
 async function saveProgress(studentId, problemId, score) {
     try {
-        // Nếu chưa có dữ liệu, khởi tạo mới
         if (!progressData[studentId]) {
             progressData[studentId] = {
                 completedExercises: 0,
                 totalScore: 0,
                 averageScore: 0,
-                problemsDone: [] // ✅ Thêm danh sách bài đã làm
+                problemsDone: []
             };
         }
 
         let studentProgress = progressData[studentId];
 
-        // Nếu bài tập chưa có trong danh sách -> thêm vào
         if (!studentProgress.problemsDone.includes(problemId)) {
             studentProgress.problemsDone.push(problemId);
             studentProgress.completedExercises++;
@@ -165,7 +163,15 @@ async function saveProgress(studentId, problemId, score) {
             studentProgress.averageScore = studentProgress.totalScore / studentProgress.completedExercises;
         }
 
-        // Gửi API để cập nhật trên GitHub JSON
+        // 🔹 In ra dữ liệu để kiểm tra trước khi gửi
+        console.log("📌 Dữ liệu gửi lên API:", JSON.stringify({
+            studentId,
+            completedExercises: studentProgress.completedExercises,
+            totalScore: studentProgress.totalScore,
+            averageScore: studentProgress.averageScore,
+            problemsDone: studentProgress.problemsDone
+        }, null, 2));
+
         const response = await fetch("/api/save-progress", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -174,7 +180,7 @@ async function saveProgress(studentId, problemId, score) {
                 completedExercises: studentProgress.completedExercises,
                 totalScore: studentProgress.totalScore,
                 averageScore: studentProgress.averageScore,
-                problemsDone: studentProgress.problemsDone // ✅ Thêm danh sách bài tập đã làm
+                problemsDone: studentProgress.problemsDone
             })
         });
 
@@ -182,7 +188,7 @@ async function saveProgress(studentId, problemId, score) {
         if (response.ok) {
             console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
         } else {
-            console.error(`❌ Lỗi cập nhật tiến trình:`, result);
+            console.error(`❌ Lỗi cập nhật tiến trình (API Response):`, result);
         }
     } catch (error) {
         console.error("❌ Lỗi khi lưu tiến trình:", error);
