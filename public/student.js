@@ -473,7 +473,7 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         
         // Hiển thị kết quả
         displayResult(response);
-        / 🛠️ Cập nhật tiến trình học sinh với điểm số mới
+        //Cập nhật tiến trình học sinh với điểm số mới
         await saveProgress(studentId, response.score);
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
