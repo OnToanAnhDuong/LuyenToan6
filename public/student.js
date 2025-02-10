@@ -145,6 +145,11 @@ function updateProgressUI() {
 // Lưu tiến trình học sinh vào `progress.json`
 async function saveProgress(studentId, problemId, score) {
     try {
+        if (!studentId || !problemId) {
+            console.error("❌ Thiếu studentId hoặc problemId!");
+            return;
+        }
+
         if (!progressData[studentId]) {
             progressData[studentId] = {
                 completedExercises: 0,
@@ -163,9 +168,10 @@ async function saveProgress(studentId, problemId, score) {
             studentProgress.averageScore = studentProgress.totalScore / studentProgress.completedExercises;
         }
 
-        // 🔹 In ra dữ liệu để kiểm tra trước khi gửi
+        // 🔹 In ra console dữ liệu gửi lên API
         console.log("📌 Dữ liệu gửi lên API:", JSON.stringify({
             studentId,
+            problemId,
             completedExercises: studentProgress.completedExercises,
             totalScore: studentProgress.totalScore,
             averageScore: studentProgress.averageScore,
@@ -177,6 +183,7 @@ async function saveProgress(studentId, problemId, score) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 studentId,
+                problemId,
                 completedExercises: studentProgress.completedExercises,
                 totalScore: studentProgress.totalScore,
                 averageScore: studentProgress.averageScore,
@@ -194,6 +201,7 @@ async function saveProgress(studentId, problemId, score) {
         console.error("❌ Lỗi khi lưu tiến trình:", error);
     }
 }
+
 
 // Chuyển đổi ảnh thành Base64
 function getBase64(file) {
