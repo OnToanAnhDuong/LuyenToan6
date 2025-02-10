@@ -1,63 +1,77 @@
+import fetch from "node-fetch";
 
-import { Octokit } from "octokit";
+const GITHUB_SAVE_PROGRESS_URL = "https://api.github.com/repos/OnToanAnhDuong/LuyenToan6/contents/data/progress.json";
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // Token GitHub từ biến môi trường
-const REPO_OWNER = "OnToanAnhDuong"; // Chủ sở hữu repository
-const REPO_NAME = "LuyenToan6"; // Tên repository
-const FILE_PATH = "data/progress.json"; // Đường dẫn file JSON trên GitHub
-
-const octokit = new Octokit({ auth: GITHUB_TOKEN });
-
-// 🔹 1. Lấy nội dung file `progress.json` từ GitHub
-async function getProgressData() {
-    try {
-        const response = await octokit.request(`GET /repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`);
-        const fileContent = Buffer.from(response.data.content, "base64").toString("utf-8");
-        return { data: JSON.parse(fileContent), sha: response.data.sha };
-    } catch (error) {
-        console.error("❌ Lỗi lấy dữ liệu progress.json:", error);
-        return { data: {}, sha: null };
-    }
-}
-
-// 🔹 2. Lưu tiến trình học sinh lên GitHub
-export default async function handler(req, res) {
+export default async function (req, res) {
     if (req.method !== "POST") {
-        return res.status(405).json({ message: "Chỉ hỗ trợ phương thức POST!" });
+        return res.status(405).json({ error: "❌ Phương thức không hợp lệ! Chỉ hỗ trợ POST." });
+    }
+
+    // 🔹 Lấy token từ biến môi trường
+    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+    if (!GITHUB_TOKEN) {
+        return res.status(500).json({ error: "❌ Lỗi: Không tìm thấy GITHUB_TOKEN trong môi trường!" });
     }
 
     try {
-        const { studentId, completedExercises, averageScore, problems } = req.body;
-        if (!studentId) return res.status(400).json({ message: "Thiếu mã học sinh!" });
+        // 1️⃣ 🟢 Lấy dữ liệu từ request
+        const { studentId, completedExercises, averageScore } = req.body;
+        if (!studentId) {
+            return res.status(400).json({ error: "❌ Thiếu studentId!" });
+        }
 
         console.log(`📌 Đang cập nhật tiến trình cho học sinh: ${studentId}`);
 
-        const { data: progressData, sha } = await getProgressData();
-
-        // Cập nhật tiến trình
-        progressData[studentId] = {
-            completed: completedExercises,
-            totalScore: (averageScore * completedExercises).toFixed(2),
-            averageScore: averageScore.toFixed(2),
-            problems
-        };
-
-        // Chuyển đổi dữ liệu thành base64
-        const updatedContent = Buffer.from(JSON.stringify(progressData, null, 2), "utf-8").toString("base64");
-
-        // 🔹 3. Gửi yêu cầu cập nhật file lên GitHub
-        await octokit.request(`PUT /repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
-            message: `Cập nhật tiến trình học sinh: ${studentId}`,
-            content: updatedContent,
-            sha, // Cần `sha` để cập nhật file trên GitHub
-            branch: "main"
+        // 2️⃣ 🟢 Lấy nội dung hiện tại của progress.json từ GitHub
+        const response = await fetch(GITHUB_SAVE_PROGRESS_URL, {
+            method: "GET",
+            headers: {
+                "Authorization": `token ${GITHUB_TOKEN}`,
+                "Accept": "application/vnd.github.v3+json"
+            }
         });
 
-        console.log(`✅ Tiến trình học sinh ${studentId} đã lưu lên GitHub!`);
-        res.status(200).json({ message: "Cập nhật tiến trình thành công!" });
+        if (!response.ok) {
+            throw new Error(`❌ Lỗi khi lấy dữ liệu progress.json: ${response.statusText}`);
+        }
+
+        const fileData = await response.json();
+        const sha = fileData.sha; // Lấy SHA để cập nhật file
+        const currentContent = JSON.parse(Buffer.from(fileData.content, "base64").toString("utf-8"));
+
+        // 3️⃣ 🟢 Cập nhật dữ liệu tiến trình học sinh
+        currentContent[studentId] = {
+            completedExercises,
+            averageScore
+        };
+
+        // 4️⃣ 🟢 Chuyển dữ liệu thành Base64 trước khi ghi lại
+        const updatedContent = Buffer.from(JSON.stringify(currentContent, null, 2)).toString("base64");
+
+        // 5️⃣ 🟢 Ghi dữ liệu mới lên GitHub
+        const updateResponse = await fetch(GITHUB_SAVE_PROGRESS_URL, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${GITHUB_TOKEN}`,
+                "Accept": "application/vnd.github.v3+json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: `Cập nhật tiến trình của học sinh ${studentId}`,
+                content: updatedContent,
+                sha: sha
+            })
+        });
+
+        if (!updateResponse.ok) {
+            throw new Error(`❌ Lỗi khi cập nhật progress.json: ${updateResponse.statusText}`);
+        }
+
+        console.log(`✅ Đã cập nhật tiến trình của học sinh ${studentId}`);
+        return res.status(200).json({ message: "✅ Cập nhật tiến trình thành công!" });
 
     } catch (error) {
-        console.error("❌ Lỗi khi lưu tiến trình:", error);
-        res.status(500).json({ message: "Lỗi khi lưu tiến trình!" });
+        console.error("❌ Lỗi khi cập nhật tiến trình:", error);
+        return res.status(500).json({ error: error.message });
     }
 }
