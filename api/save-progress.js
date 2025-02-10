@@ -26,7 +26,7 @@ export default async function (req, res) {
         const response = await fetch(GITHUB_SAVE_PROGRESS_URL, {
             method: "GET",
             headers: {
-                "Authorization": `token ${GITHUB_TOKEN}`,
+                "Authorization": `Bearer ${GITHUB_TOKEN}`,
                 "Accept": "application/vnd.github.v3+json"
             }
         });
@@ -66,7 +66,7 @@ export default async function (req, res) {
         const updateResponse = await fetch(GITHUB_SAVE_PROGRESS_URL, {
             method: "PUT",
             headers: {
-                "Authorization": `token ${GITHUB_TOKEN}`,
+                "Authorization": `Bearer ${GITHUB_TOKEN}`,
                 "Accept": "application/vnd.github.v3+json",
                 "Content-Type": "application/json"
             },
