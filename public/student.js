@@ -40,6 +40,8 @@ async function initStudentPage() {
     await loadStudentData(studentId);
     await loadProblems();
     await loadProgress(studentId);
+    updateProblemColors(); // Cập nhật màu bài tập đã làm
+    
     console.log("✅ Trang học sinh đã khởi tạo hoàn tất!");
 }
 
@@ -135,7 +137,22 @@ async function loadProgress(studentId) {
         console.error("❌ Lỗi khi tải tiến trình:", error);
     }
 }
+ updateProblemColors(); // Cập nhật màu sắc bài tập
+}
 
+// ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
+function updateProblemColors() {
+    const problemBoxes = document.querySelectorAll(".problem-box");
+
+    problemBoxes.forEach(box => {
+        const problemId = box.dataset.id;
+        if (progressData.problemsDone && progressData.problemsDone.includes(problemId)) {
+            box.style.backgroundColor = "green"; // Bài đã làm
+        } else {
+            box.style.backgroundColor = "yellow"; // Bài chưa làm
+        }
+    });
+}
 // Cập nhật tiến trình UI
 function updateProgressUI() {
     document.getElementById("completedExercises").textContent = progressData.completedExercises || 0;
