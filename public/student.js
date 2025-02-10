@@ -136,9 +136,8 @@ async function loadProgress(studentId) {
     } catch (error) {
         console.error("❌ Lỗi khi tải tiến trình:", error);
     }
-}
  updateProblemColors(); // Cập nhật màu sắc bài tập
-
+}
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
