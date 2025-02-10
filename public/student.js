@@ -138,7 +138,7 @@ async function loadProgress(studentId) {
     }
 }
  updateProblemColors(); // Cập nhật màu sắc bài tập
-}
+
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
