@@ -1,3 +1,4 @@
+
 /* Thêm Google Fonts cho hỗ trợ tiếng Việt */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
@@ -138,15 +139,6 @@ h1 {
     background-color: #0056b3;
 }
 
-/* Kết quả chấm bài */
-#result {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-}
-
 /* Upload ảnh bài làm */
 #studentImage {
     margin-top: 20px;
@@ -233,4 +225,77 @@ h1 {
     #imageContainer {
         width: 100%;
     }
+}
+/* 🔹 Cấu trúc chung */
+.result-box {
+    width: 100%;
+    overflow-x: auto;
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    white-space: pre-wrap;
+    margin: 10px 0; /* Giữ khoảng cách hợp lý */
+}
+
+/* 🔹 Mỗi phần hiển thị */
+.result-section {
+    display: flex;
+    flex-direction: column; /* Xếp tiêu đề và nội dung theo chiều dọc */
+    align-items: flex-start; /* Căn lề tiêu đề về bên trái */
+    padding-bottom: 8px; /* Giữ khoảng cách nhỏ giữa các phần */
+}
+
+/* 🔹 Tiêu đề (không bị co lại khi nội dung dài) */
+.result-box h3 {
+    flex-shrink: 0; /* Không cho tiêu đề co lại */
+    min-height: 30px; /* Đặt chiều cao tối thiểu cho tiêu đề */
+    margin: 8px 0 4px 0; /* Giảm khoảng cách giữa tiêu đề và nội dung */
+    font-size: 1.1em;
+    color: #d9534f;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: bold;
+}
+
+/* 🔹 Nội dung luôn hiển thị đúng kích thước */
+.result-box p {
+    background-color: #ffffff;
+    padding: 6px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.4;
+    margin: 0; /* Loại bỏ margin dư thừa */
+}
+/* 🔹 Responsive: Điều chỉnh trên thiết bị nhỏ */
+@media (max-width: 768px) {
+    .result-box {
+        padding: 8px; /* Giảm padding trên màn hình nhỏ */
+    }
+}
+/* 🔹 Điều chỉnh khoảng cách giữa các phần */
+/* 🔹 Giảm khoảng cách giữa các phần nội dung */
+.result-box .result-section {
+    margin-bottom: 6px; /* Giảm khoảng cách giữa các phần */
+    padding-bottom: 4px;
+}
+
+/* 🔹 Điều chỉnh tiêu đề */
+.result-box h3 {
+    margin-top: 2px;  /* Giảm khoảng cách phía trên tiêu đề */
+    margin-bottom: 4px; /* Giữ tiêu đề gần nội dung hơn */
+}
+
+/* 🔹 Điều chỉnh phần nội dung */
+.result-box pre {
+    margin: 0; /* Loại bỏ khoảng cách thừa */
+    padding: 6px 10px; /* Giữ padding nhỏ gọn */
+}
+
+/* 🔹 Loại bỏ khoảng cách thừa ở phần cuối */
+.result-box .result-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
