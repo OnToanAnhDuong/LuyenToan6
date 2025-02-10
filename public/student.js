@@ -143,23 +143,47 @@ function updateProgressUI() {
 }
 
 // Lưu tiến trình học sinh vào `progress.json`
-async function saveProgress(studentId, score) {
+async function saveProgress(studentId, problemId, score) {
     try {
-        let completedExercises = progressData.completedExercises || 0;
-        let totalScore = (progressData.averageScore || 0) * completedExercises;
-        completedExercises += 1;
-        let averageScore = (totalScore + score) / completedExercises;
+        // Nếu chưa có dữ liệu, khởi tạo mới
+        if (!progressData[studentId]) {
+            progressData[studentId] = {
+                completedExercises: 0,
+                totalScore: 0,
+                averageScore: 0,
+                problemsDone: [] // ✅ Thêm danh sách bài đã làm
+            };
+        }
 
-        progressData.completedExercises = completedExercises;
-        progressData.averageScore = averageScore;
+        let studentProgress = progressData[studentId];
 
-        await fetch("/api/save-progress", {
+        // Nếu bài tập chưa có trong danh sách -> thêm vào
+        if (!studentProgress.problemsDone.includes(problemId)) {
+            studentProgress.problemsDone.push(problemId);
+            studentProgress.completedExercises++;
+            studentProgress.totalScore += score;
+            studentProgress.averageScore = studentProgress.totalScore / studentProgress.completedExercises;
+        }
+
+        // Gửi API để cập nhật trên GitHub JSON
+        const response = await fetch("/api/save-progress", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ studentId, completedExercises, averageScore })
+            body: JSON.stringify({
+                studentId,
+                completedExercises: studentProgress.completedExercises,
+                totalScore: studentProgress.totalScore,
+                averageScore: studentProgress.averageScore,
+                problemsDone: studentProgress.problemsDone // ✅ Thêm danh sách bài tập đã làm
+            })
         });
 
-        console.log(`✅ Tiến trình đã được cập nhật: ${completedExercises} bài, Điểm TB: ${averageScore.toFixed(2)}`);
+        const result = await response.json();
+        if (response.ok) {
+            console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
+        } else {
+            console.error(`❌ Lỗi cập nhật tiến trình:`, result);
+        }
     } catch (error) {
         console.error("❌ Lỗi khi lưu tiến trình:", error);
     }
@@ -474,7 +498,7 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         // Hiển thị kết quả
         displayResult(response);
         //Cập nhật tiến trình học sinh với điểm số mới
-        await saveProgress(studentId, response.score);
+        await saveProgress(studentId, currentProblem.index, response.score);
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
         document.getElementById("result").innerText = `❌ Lỗi: ${error.message}`;
