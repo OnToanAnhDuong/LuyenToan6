@@ -528,8 +528,10 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         
         // Hiển thị kết quả
         displayResult(response);
-        //Cập nhật tiến trình học sinh với điểm số mới
+        // ✅ Cập nhật tiến trình sau khi chấm bài
         await saveProgress(studentId, currentProblem.index, response.score);
+        await loadProgress(studentId); // Cập nhật tiến trình sau khi lưu
+        updateProblemColors(); // Cập nhật màu bài tập
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
         document.getElementById("result").innerText = `❌ Lỗi: ${error.message}`;
