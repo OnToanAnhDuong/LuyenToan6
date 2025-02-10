@@ -1,73 +1,55 @@
+const PROGRESS_URL = '/data/progress.json'; // Đường dẫn file tiến trình
 
-const PROGRESS_URL = "/api/get-progress"; // API lấy tiến trình từ GitHub
-const SAVE_PROGRESS_URL = "/api/save-progress"; // API lưu tiến trình
+let progressData = {}; // Biến toàn cục lưu tiến trình học sinh
 
-let progressData = {}; // Biến lưu tiến trình học sinh
-
-// 🔹 1. Tải tiến trình học sinh từ GitHub JSON
+// ✅ Tải tiến trình học sinh
 export async function loadProgress(studentId) {
     try {
-        const response = await fetch(`${PROGRESS_URL}?studentId=${studentId}`);
-        if (!response.ok) throw new Error("❌ Không thể tải tiến trình học sinh!");
-        progressData = await response.json() || {};
-        console.log("✅ Tiến trình đã tải:", progressData);
-        updateProgressUI(studentId);
+        const response = await fetch(PROGRESS_URL);
+        if (!response.ok) throw new Error('Không thể tải tiến trình học sinh.');
+        const data = await response.json();
+        
+        // Nếu học sinh chưa có tiến trình, tạo mới
+        progressData = data[studentId] || { completedExercises: 0, totalScore: 0, averageScore: 0 };
+        console.log(`✅ Tiến trình của học sinh ${studentId} đã tải:`, progressData);
+
+        updateProgressUI(); // Cập nhật giao diện
     } catch (error) {
-        console.error("❌ Lỗi tải tiến trình:", error);
+        console.error('❌ Lỗi tải tiến trình:', error);
     }
 }
 
-// 🔹 2. Cập nhật số bài đã làm, điểm trung bình
-export async function updateStudentProgress(studentId, score, problemIndex) {
-    if (!progressData[studentId]) {
-        progressData[studentId] = { completed: 0, totalScore: 0, averageScore: 0, problems: [] };
-    }
-
-    // Nếu bài này chưa làm, thêm vào danh sách
-    if (!progressData[studentId].problems.includes(problemIndex)) {
-        progressData[studentId].completed++;
-        progressData[studentId].totalScore += score;
-        progressData[studentId].problems.push(problemIndex);
-        progressData[studentId].averageScore = (progressData[studentId].totalScore / progressData[studentId].completed).toFixed(2);
-    }
-
-    console.log(`📌 Cập nhật tiến trình ${studentId}:`, progressData[studentId]);
-
-    await saveProgress(studentId);
-    updateProgressUI(studentId);
-}
-
-// 🔹 3. Lưu tiến trình học sinh lên GitHub JSON
-async function saveProgress(studentId) {
+// ✅ Lưu tiến trình học sinh
+export async function saveProgress(studentId, score) {
     try {
-        const response = await fetch(SAVE_PROGRESS_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                studentId,
-                completedExercises: progressData[studentId].completed,
-                averageScore: progressData[studentId].averageScore,
-                problems: progressData[studentId].problems
-            })
+        // Nếu chưa có dữ liệu, khởi tạo
+        if (!progressData) progressData = {};
+        if (!progressData[studentId]) {
+            progressData[studentId] = { completedExercises: 0, totalScore: 0, averageScore: 0 };
+        }
+
+        // Cập nhật tiến trình
+        progressData[studentId].completedExercises++;
+        progressData[studentId].totalScore += score;
+        progressData[studentId].averageScore = progressData[studentId].totalScore / progressData[studentId].completedExercises;
+
+        // Gửi dữ liệu cập nhật lên server
+        await fetch('/api/save-progress', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(progressData)
         });
 
-        if (!response.ok) throw new Error("❌ Không thể lưu tiến trình!");
-        console.log("✅ Tiến trình đã lưu lên GitHub!");
+        console.log(`✅ Tiến trình học sinh ${studentId} đã lưu thành công!`);
+        updateProgressUI(); // Cập nhật UI sau khi lưu
+
     } catch (error) {
-        console.error("❌ Lỗi khi lưu tiến trình:", error);
+        console.error('❌ Lỗi lưu tiến trình:', error);
     }
 }
 
-// 🔹 4. Hiển thị số bài đã làm và điểm trung bình
-function updateProgressUI(studentId) {
-    document.getElementById("completedExercises").textContent = progressData[studentId]?.completed || 0;
-    document.getElementById("averageScore").textContent = progressData[studentId]?.averageScore || 0;
+// ✅ Cập nhật giao diện UI
+function updateProgressUI() {
+    document.getElementById("completedExercises").textContent = progressData.completedExercises || 0;
+    document.getElementById("averageScore").textContent = progressData.averageScore?.toFixed(2) || 0;
 }
-
-// 🚀 Khi tải trang, tự động load tiến trình
-document.addEventListener("DOMContentLoaded", async function () {
-    const studentId = localStorage.getItem("studentId");
-    if (studentId) {
-        await loadProgress(studentId);
-    }
-});
