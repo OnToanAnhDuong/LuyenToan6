@@ -131,22 +131,25 @@ function displayProblem(problem) {
 // Tải tiến trình học sinh
 async function loadProgress(studentId) {
     try {
+        console.log(`🔹 Đang tải tiến trình cho học sinh: ${studentId}`);
+
         const response = await fetch(`/api/get-progress?studentId=${studentId}`);
         if (!response.ok) {
-            throw new Error("Không thể tải tiến trình học sinh.");
+            throw new Error(`Không thể tải tiến trình (Mã lỗi: ${response.status})`);
         }
 
-        progressData = await response.json();
+        const progress = await response.json();
+        if (!progress || Object.keys(progress).length === 0) {
+            throw new Error(`❌ Không tìm thấy tiến trình của học sinh ${studentId}.`);
+        }
+
+        progressData = progress;
         console.log(`✅ Tiến trình của học sinh ${studentId}:`, progressData);
-
-        if (!progressData.problemsDone) {
-            progressData.problemsDone = [];  // Đảm bảo không bị lỗi undefined
-        }
-
-        updateProgressUI();  
-        setTimeout(updateProblemColors, 500);  // ⏳ Chờ 500ms để đảm bảo dữ liệu cập nhật
+        updateProgressUI();
+        updateProblemColors();
     } catch (error) {
         console.error("❌ Lỗi khi tải tiến trình:", error);
+        alert("⚠ Không thể tải tiến trình học sinh! Hãy kiểm tra lại dữ liệu.");
     }
 }
 
