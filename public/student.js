@@ -121,21 +121,6 @@ function displayProblemList(problems) {
     console.log("✅ Danh sách bài tập đã cập nhật.");
 }
 
-
-        problemBox.addEventListener("click", async () => {
-            if (progressData[problem.index]) {
-                alert("📌 Bài tập này đã làm! Vui lòng chọn bài tập khác hoặc chọn bài tương tự.");
-                return;
-            }
-            displayProblem(problem); // Hiển thị nội dung bài tập
-        });
-
-        problemContainer.appendChild(problemBox);
-    });
-
-    console.log("✅ Danh sách bài tập đã cập nhật.");
-}
-
 // Hiển thị nội dung bài tập khi học sinh chọn bài
 function displayProblem(problem) {
     document.getElementById("problemText").innerHTML = problem.problem; // Hiển thị đề bài
