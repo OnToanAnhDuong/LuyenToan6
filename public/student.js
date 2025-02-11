@@ -149,31 +149,29 @@ function updateProblemColors() {
     console.log("📌 Đang cập nhật màu bài tập...");
     console.log("📌 Danh sách bài đã làm trước khi cập nhật màu:", progressData.problemsDone);
 
-    if (!progressData.problemsDone) {
-        console.warn("⚠ `progressData.problemsDone` không tồn tại hoặc rỗng.");
-        progressData.problemsDone = [];
+    if (!progressData.problemsDone || !Array.isArray(progressData.problemsDone)) {
+        console.warn("⚠ `progressData.problemsDone` không tồn tại hoặc không phải mảng.");
+        return;
     }
 
-    // Chuyển `problemId` sang dạng string để tránh lỗi so sánh
-    const problemsDone = progressData.problemsDone.map(id => String(id));
-
     problemBoxes.forEach(box => {
-        const problemId = box.dataset.id;
+        let problemKey = `Bài ${box.dataset.id}`;  // 🆕 Chuyển dataset.id thành "Bài X"
 
-        if (!problemId) {
+        if (!problemKey) {
             console.warn("⚠ Không tìm thấy ID bài tập:", box);
             return;
         }
 
-        if (problemsDone.includes(String(problemId))) {
-            box.style.backgroundColor = "green"; // Bài đã làm
-            console.log(`🟢 Đổi màu xanh: Bài ${problemId}`);
+        if (progressData.problemsDone.includes(problemKey)) {
+            box.style.backgroundColor = "green";
+            console.log(`🟢 Đổi màu xanh: ${problemKey}`);
         } else {
-            box.style.backgroundColor = "yellow"; // Bài chưa làm
-            console.log(`🟡 Đổi màu vàng: Bài ${problemId}`);
+            box.style.backgroundColor = "yellow";
+            console.log(`🟡 Đổi màu vàng: ${problemKey}`);
         }
     });
 }
+
 
 // Cập nhật tiến trình UI
 function updateProgressUI() {
