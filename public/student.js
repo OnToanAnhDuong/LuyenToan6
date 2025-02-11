@@ -515,7 +515,7 @@ if (!studentId) {
         // Hiển thị kết quả
         displayResult(response);
         // ✅ Cập nhật tiến trình sau khi chấm bài
-       if (!currentProblem || !currentProblem.index) {
+      if (!currentProblem || typeof currentProblem.index === "undefined") {
         console.error("❌ Không có bài tập nào được chọn!", { currentProblem });
         alert("⚠ Vui lòng chọn bài tập trước khi chấm.");
         return;
