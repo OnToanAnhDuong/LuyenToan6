@@ -144,16 +144,19 @@ async function loadProgress(studentId) {
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
+    const problemBoxes = document.querySelectorAll(".problem-box");
+
     console.log("📌 Đang cập nhật màu bài tập...");
-    console.log("📌 Danh sách bài đã làm:", progressData.problemsDone);
+    console.log("📌 Danh sách bài đã làm trước khi cập nhật màu:", progressData.problemsDone);
 
     if (!progressData.problemsDone) {
+        console.warn("⚠ `progressData.problemsDone` không tồn tại hoặc rỗng.");
         progressData.problemsDone = [];
     }
 
-    const problemsDone = progressData.problemsDone.map(id => String(id)); // Chuyển hết về string
+    // Chuyển `problemId` sang dạng string để tránh lỗi so sánh
+    const problemsDone = progressData.problemsDone.map(id => String(id));
 
-    const problemBoxes = document.querySelectorAll(".problem-box");
     problemBoxes.forEach(box => {
         const problemId = box.dataset.id;
 
@@ -162,7 +165,7 @@ function updateProblemColors() {
             return;
         }
 
-        if (problemsDone.includes(problemId)) {
+        if (problemsDone.includes(String(problemId))) {
             box.style.backgroundColor = "green"; // Bài đã làm
             console.log(`🟢 Đổi màu xanh: Bài ${problemId}`);
         } else {
