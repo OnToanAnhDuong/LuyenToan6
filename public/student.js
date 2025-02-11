@@ -149,15 +149,33 @@ async function loadProgress(studentId) {
 function updateProblemColors() {
     const problemBoxes = document.querySelectorAll(".problem-box");
 
+    console.log("📌 Đang cập nhật màu bài tập...");
+    console.log("📌 Danh sách bài đã làm:", progressData.problemsDone);
+
+    if (!progressData.problemsDone) {
+        progressData.problemsDone = [];
+    }
+
+    const problemsDone = progressData.problemsDone.map(n => Number(n)); // Ép kiểu số
+
     problemBoxes.forEach(box => {
-        const problemId = box.dataset.id;
-        if (progressData.problemsDone && progressData.problemsDone.includes(problemId)) {
+        const problemId = Number(box.dataset.id); // Ép kiểu số
+
+        if (!problemId) {
+            console.warn("⚠ Không tìm thấy ID bài tập:", box);
+            return;
+        }
+
+        if (problemsDone.includes(problemId)) {
             box.style.backgroundColor = "green"; // Bài đã làm
+            console.log(`🟢 Đổi màu xanh: Bài ${problemId}`);
         } else {
             box.style.backgroundColor = "yellow"; // Bài chưa làm
+            console.log(`🟡 Đổi màu vàng: Bài ${problemId}`);
         }
     });
 }
+
 // Cập nhật tiến trình UI
 function updateProgressUI() {
     document.getElementById("completedExercises").textContent = progressData.completedExercises || 0;
