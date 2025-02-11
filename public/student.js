@@ -171,9 +171,7 @@ async function saveProgress(studentId, problemId, score) {
             return;
         }
 
-        if (!progressData.problemsDone) {
-            progressData.problemsDone = [];
-        }
+        progressData.problemsDone = progressData.problemsDone || [];
 
         if (!progressData.problemsDone.includes(problemId)) {
             progressData.problemsDone.push(problemId);
