@@ -184,11 +184,22 @@ async function saveProgress(studentId, problemId, score) {
 
         console.log("📌 Tiến trình cập nhật cục bộ:", progressData);
 
-        const response = await fetch("/api/save-progress", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(progressData)
-        });
+        const requestData = {
+    studentId: studentId,
+    problemId: problemId,
+    completedExercises: progressData.completedExercises || 0,
+    totalScore: progressData.totalScore || 0,
+    averageScore: progressData.averageScore || 0,
+    problemsDone: progressData.problemsDone || []
+    };
+    
+    console.log("📌 Gửi dữ liệu lên API:", JSON.stringify(requestData, null, 2));
+    
+    const response = await fetch("/api/save-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData)
+    });
 
         const result = await response.json();
         if (response.ok) {
