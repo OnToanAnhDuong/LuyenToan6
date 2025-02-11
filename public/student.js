@@ -203,9 +203,9 @@ async function saveProgress(studentId, problemId, score) {
             progressData.averageScore = progressData.totalScore / progressData.completedExercises;
         }
 
-        const requestData = {
+              const requestData = {
             studentId: studentId,
-            problemId: problemId,
+            problemId: `Bài ${problemId}`,  // Đổi thành chuỗi "Bài X"
             completedExercises: progressData.completedExercises || 0,
             totalScore: progressData.totalScore || 0,
             averageScore: progressData.averageScore || 0,
