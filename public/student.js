@@ -94,28 +94,34 @@ function displayProblemList(problems) {
         problemBox.className = "problem-box";
         problemBox.dataset.id = problem.index;
 
-        function updateProblemColor() {
-            if (progressData[problem.index]) {
-                problemBox.style.backgroundColor = "green"; // Bài đã làm
-            } else {
-                problemBox.style.backgroundColor = "yellow"; // Bài chưa làm
-            }
+function updateProblemColors() {
+    const problemBoxes = document.querySelectorAll(".problem-box");
+
+    console.log("📌 Đang cập nhật màu bài tập...");
+    console.log("📌 Danh sách bài đã làm:", progressData.problemsDone);
+
+    if (!progressData.problemsDone) {
+        progressData.problemsDone = [];
+    }
+
+    const problemsDone = progressData.problemsDone.map(n => Number(n)); // Ép kiểu số
+
+    problemBoxes.forEach(box => {
+        const problemId = Number(box.dataset.id); // Ép kiểu số
+
+        if (!problemId) {
+            console.warn("⚠ Không tìm thấy ID bài tập:", box);
+            return;
         }
 
-        updateProblemColor();
-
-        problemBox.addEventListener("click", async () => {
-            if (progressData[problem.index]) {
-                alert("📌 Bài tập này đã làm! Vui lòng chọn bài tập khác hoặc chọn bài tương tự.");
-                return;
-            }
-            displayProblem(problem); // Hiển thị nội dung bài tập
-        });
-
-        problemContainer.appendChild(problemBox);
+        if (problemsDone.includes(problemId)) {
+            box.style.backgroundColor = "green"; // Bài đã làm
+            console.log(`🟢 Đổi màu xanh: Bài ${problemId}`);
+        } else {
+            box.style.backgroundColor = "yellow"; // Bài chưa làm
+            console.log(`🟡 Đổi màu vàng: Bài ${problemId}`);
+        }
     });
-
-    console.log("✅ Danh sách bài tập đã cập nhật.");
 }
 
 // Hiển thị nội dung bài tập khi học sinh chọn bài
