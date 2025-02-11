@@ -8,5 +8,13 @@
       2,
       3
     ]
+  },
+  "HS002": {
+    "completedExercises": 1,
+    "totalScore": null,
+    "averageScore": null,
+    "problemsDone": [
+      1
+    ]
   }
 }
