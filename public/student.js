@@ -68,6 +68,21 @@ const loadStudentData = async (studentId) => {
     }
 };
 
+// Hàm tải danh sách bài tập từ `problems.json`
+const loadProblems = async () => {
+    try {
+        const response = await fetch('/api/get-problems');
+        if (!response.ok) {
+            throw new Error("Không thể tải danh sách bài tập!");
+        }
+        const problems = await response.json();
+        console.log("✅ Danh sách bài tập:", problems);
+        displayProblemList(problems);
+    } catch (error) {
+        console.error("❌ Lỗi khi tải danh sách bài tập:", error);
+    }
+};
+
 // Hiển thị danh sách bài tập
 function displayProblemList(problems) {
     const problemContainer = document.getElementById("problemList");
@@ -78,35 +93,29 @@ function displayProblemList(problems) {
         problemBox.textContent = problem.index;
         problemBox.className = "problem-box";
         problemBox.dataset.id = problem.index;
-function updateProblemColors() {
-    const problemBoxes = document.querySelectorAll(".problem-box");
 
-    console.log("📌 Đang cập nhật màu bài tập...");
-    console.log("📌 Danh sách bài đã làm:", progressData.problemsDone);
-
-    if (!progressData.problemsDone) {
-        progressData.problemsDone = [];
-    }
-
-    // 🔹 Chuyển tất cả `problemId` sang kiểu `string` để tránh lỗi so sánh
-    const problemsDone = progressData.problemsDone.map(id => String(id));
-
-    problemBoxes.forEach(box => {
-        const problemId = box.dataset.id;
-
-        if (!problemId) {
-            console.warn("⚠ Không tìm thấy ID bài tập:", box);
-            return;
+        function updateProblemColor() {
+            if (progressData[problem.index]) {
+                problemBox.style.backgroundColor = "green"; // Bài đã làm
+            } else {
+                problemBox.style.backgroundColor = "yellow"; // Bài chưa làm
+            }
         }
 
-        if (problemsDone.includes(String(problemId))) {
-            box.style.backgroundColor = "green"; // Bài đã làm
-            console.log(`🟢 Đổi màu xanh: Bài ${problemId}`);
-        } else {
-            box.style.backgroundColor = "yellow"; // Bài chưa làm
-            console.log(`🟡 Đổi màu vàng: Bài ${problemId}`);
-        }
+        updateProblemColor();
+
+        problemBox.addEventListener("click", async () => {
+            if (progressData[problem.index]) {
+                alert("📌 Bài tập này đã làm! Vui lòng chọn bài tập khác hoặc chọn bài tương tự.");
+                return;
+            }
+            displayProblem(problem); // Hiển thị nội dung bài tập
+        });
+
+        problemContainer.appendChild(problemBox);
     });
+
+    console.log("✅ Danh sách bài tập đã cập nhật.");
 }
 
 // Hiển thị nội dung bài tập khi học sinh chọn bài
@@ -117,64 +126,36 @@ function displayProblem(problem) {
 }
 
 // Tải tiến trình học sinh
-const loadProblems = async () => {
+async function loadProgress(studentId) {
     try {
-        console.log("🔄 Đang tải danh sách bài tập...");
-
-        const response = await fetch('/api/get-problems');
-        if (!response.ok) {
-            throw new Error(`Lỗi API: ${response.status} - ${response.statusText}`);
-        }
-
-        const problems = await response.json();
-
-        // 🔹 Kiểm tra xem `problems` có phải là mảng không
-        if (!problems || !Array.isArray(problems)) {
-            console.error("❌ API không trả về một mảng hợp lệ! Dữ liệu nhận được:", problems);
-            throw new Error("API không trả về một danh sách bài tập hợp lệ.");
-        }
-
-        console.log("✅ Danh sách bài tập đã tải:", problems);
-        displayProblemList(problems);
+        const response = await fetch(`/api/get-progress?studentId=${studentId}`);
+        const progress = await response.json();
+        progressData = progress || {}; // Lưu vào biến toàn cục
+        console.log(`✅ Tiến trình của học sinh ${studentId}:`, progressData);
+        updateProgressUI();
     } catch (error) {
-        console.error("❌ Lỗi khi tải danh sách bài tập:", error);
-        alert("⚠ Không thể tải danh sách bài tập! Vui lòng thử lại.");
+        console.error("❌ Lỗi khi tải tiến trình:", error);
     }
-};
+ updateProblemColors(); // Cập nhật màu sắc bài tập
+}
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
     const problemBoxes = document.querySelectorAll(".problem-box");
 
-    console.log("📌 Đang cập nhật màu bài tập...");
-    console.log("📌 Danh sách bài đã làm:", progressData.problemsDone);
-
-    if (!progressData.problemsDone) {
-        progressData.problemsDone = [];
-    }
-
     problemBoxes.forEach(box => {
         const problemId = box.dataset.id;
-
-        if (!problemId) {
-            console.warn("⚠ Không tìm thấy ID bài tập:", box);
-            return;
-        }
-
-        if (progressData.problemsDone.includes(problemId)) {
+        if (progressData.problemsDone && progressData.problemsDone.includes(problemId)) {
             box.style.backgroundColor = "green"; // Bài đã làm
-            console.log(`🟢 Đổi màu xanh: Bài ${problemId}`);
         } else {
             box.style.backgroundColor = "yellow"; // Bài chưa làm
-            console.log(`🟡 Đổi màu vàng: Bài ${problemId}`);
         }
     });
 }
-
 // Cập nhật tiến trình UI
 function updateProgressUI() {
     document.getElementById("completedExercises").textContent = progressData.completedExercises || 0;
-    document.getElementById("averageScore").textContent = (progressData.averageScore || 0).toFixed(2);
+    document.getElementById("averageScore").textContent = progressData.averageScore || 0;
 }
 
 // Lưu tiến trình học sinh vào `progress.json`
@@ -185,33 +166,46 @@ async function saveProgress(studentId, problemId, score) {
             return;
         }
 
-        progressData.problemsDone = progressData.problemsDone || [];
-
-        if (progressData.problemsDone.includes(Number(problemId))) {
-            progressData.problemsDone.push(problemId);
-            progressData.completedExercises = (progressData.completedExercises || 0) + 1;
-            progressData.totalScore = (progressData.totalScore || 0) + score;
-            progressData.averageScore = progressData.totalScore / progressData.completedExercises;
+        if (!progressData[studentId]) {
+            progressData[studentId] = {
+                completedExercises: 0,
+                totalScore: 0,
+                averageScore: 0,
+                problemsDone: []
+            };
         }
 
-        console.log("📌 Tiến trình cập nhật cục bộ:", progressData);
+        let studentProgress = progressData[studentId];
 
-        const requestData = {
-    studentId: studentId,
-    problemId: problemId,
-    completedExercises: progressData.completedExercises || 0,
-    totalScore: progressData.totalScore || 0,
-    averageScore: progressData.averageScore || 0,
-    problemsDone: progressData.problemsDone || []
-    };
-    
-    console.log("📌 Gửi dữ liệu lên API:", JSON.stringify(requestData, null, 2));
-    
-    const response = await fetch("/api/save-progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData)
-    });
+        if (!studentProgress.problemsDone.includes(problemId)) {
+            studentProgress.problemsDone.push(problemId);
+            studentProgress.completedExercises++;
+            studentProgress.totalScore += score;
+            studentProgress.averageScore = studentProgress.totalScore / studentProgress.completedExercises;
+        }
+
+        // 🔹 In ra console dữ liệu gửi lên API
+        console.log("📌 Dữ liệu gửi lên API:", JSON.stringify({
+            studentId,
+            problemId,
+            completedExercises: studentProgress.completedExercises,
+            totalScore: studentProgress.totalScore,
+            averageScore: studentProgress.averageScore,
+            problemsDone: studentProgress.problemsDone
+        }, null, 2));
+
+        const response = await fetch("/api/save-progress", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                studentId,
+                problemId,
+                completedExercises: studentProgress.completedExercises,
+                totalScore: studentProgress.totalScore,
+                averageScore: studentProgress.averageScore,
+                problemsDone: studentProgress.problemsDone
+            })
+        });
 
         const result = await response.json();
         if (response.ok) {
@@ -498,11 +492,7 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         return;
     }
 
-    const studentId = localStorage.getItem("studentId")?.trim();
-if (!studentId) {
-    alert("⚠ Không tìm thấy mã học sinh. Vui lòng đăng nhập lại.");
-    return;
-}
+    const studentId = localStorage.getItem("studentId");
     const problemText = document.getElementById("problemText").innerText.trim();
     const studentFileInput = document.getElementById("studentImage");
 
@@ -538,17 +528,9 @@ if (!studentId) {
         // Hiển thị kết quả
         displayResult(response);
         // ✅ Cập nhật tiến trình sau khi chấm bài
-      if (!currentProblem || typeof currentProblem.index === "undefined") {
-        console.error("❌ Không có bài tập nào được chọn!", { currentProblem });
-        alert("⚠ Vui lòng chọn bài tập trước khi chấm.");
-        return;
-        }
         await saveProgress(studentId, currentProblem.index, response.score);
-        await loadProgress(studentId); // 🚀 Tải lại tiến trình để cập nhật màu bài tập
-        setTimeout(() => {
-            updateProblemColors(); // 🟢 Cập nhật màu bài tập ngay lập tức
-            updateProgressUI(); // 📊 Cập nhật số bài đã làm và điểm trung bình
-        }, 500); // Đợi 500ms để đảm bảo DOM đã cập nhật
+        await loadProgress(studentId); // Cập nhật tiến trình sau khi lưu
+        updateProblemColors(); // Cập nhật màu bài tập
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
         document.getElementById("result").innerText = `❌ Lỗi: ${error.message}`;
