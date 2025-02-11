@@ -101,7 +101,7 @@ function displayProblemList(problems) {
                 problemBox.style.backgroundColor = "yellow"; // Bài chưa làm
             }
         }
-
+        console.log("📌 Danh sách bài đã làm (kiểu dữ liệu kiểm tra):", progressData.problemsDone.map(item => typeof item));
         updateProblemColor();
 
         problemBox.addEventListener("click", async () => {
