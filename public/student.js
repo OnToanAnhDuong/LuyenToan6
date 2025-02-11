@@ -475,7 +475,11 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         return;
     }
 
-    const studentId = localStorage.getItem("studentId");
+    const studentId = localStorage.getItem("studentId")?.trim();
+if (!studentId) {
+    alert("⚠ Không tìm thấy mã học sinh. Vui lòng đăng nhập lại.");
+    return;
+}
     const problemText = document.getElementById("problemText").innerText.trim();
     const studentFileInput = document.getElementById("studentImage");
 
@@ -511,6 +515,11 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         // Hiển thị kết quả
         displayResult(response);
         // ✅ Cập nhật tiến trình sau khi chấm bài
+       if (!currentProblem || !currentProblem.index) {
+        console.error("❌ Không có bài tập nào được chọn!", { currentProblem });
+        alert("⚠ Vui lòng chọn bài tập trước khi chấm.");
+        return;
+        }
         await saveProgress(studentId, currentProblem.index, response.score);
         await loadProgress(studentId); // Cập nhật tiến trình sau khi lưu
         updateProblemColors(); // Cập nhật màu bài tập
