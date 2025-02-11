@@ -183,8 +183,9 @@ function updateProblemColors() {
 
 // Cập nhật tiến trình UI
 function updateProgressUI() {
-    document.getElementById("completedExercises").textContent = progressData.completedExercises || 0;
-    document.getElementById("averageScore").textContent = progressData.averageScore || 0;
+    document.getElementById("completedExercises").textContent = progressData.completedExercises ?? 0;
+    document.getElementById("averageScore").textContent = (progressData.averageScore ?? 0).toFixed(2);
+
 }
 
 // Lưu tiến trình học sinh vào `progress.json`
