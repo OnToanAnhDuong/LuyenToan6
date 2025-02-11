@@ -196,16 +196,18 @@ async function saveProgress(studentId, problemId, score) {
 
         progressData.problemsDone = progressData.problemsDone || [];
 
-        if (!progressData.problemsDone.includes(problemId)) {
-            progressData.problemsDone.push(problemId);
+        // 🔹 Đảm bảo tất cả bài tập được lưu dạng `"Bài X"`
+        let problemKey = `Bài ${problemId}`;
+        if (!progressData.problemsDone.includes(problemKey)) {
+            progressData.problemsDone.push(problemKey);
             progressData.completedExercises = (progressData.completedExercises || 0) + 1;
             progressData.totalScore = (progressData.totalScore || 0) + score;
             progressData.averageScore = progressData.totalScore / progressData.completedExercises;
         }
 
-              const requestData = {
+        const requestData = {
             studentId: studentId,
-            problemId: `Bài ${problemId}`,  // Đổi thành chuỗi "Bài X"
+            problemId: problemKey,  // 🆕 Đảm bảo lưu dạng `"Bài X"`
             completedExercises: progressData.completedExercises || 0,
             totalScore: progressData.totalScore || 0,
             averageScore: progressData.averageScore || 0,
@@ -224,7 +226,7 @@ async function saveProgress(studentId, problemId, score) {
         if (response.ok) {
             console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
 
-            // 🔄 Đợi 1 giây trước khi tải lại dữ liệu để tránh lỗi 404
+            // 🔄 Đợi 1 giây trước khi tải lại dữ liệu
             setTimeout(() => {
                 console.log("🔄 Tải lại tiến trình sau khi lưu...");
                 loadProgress(studentId);
@@ -238,6 +240,7 @@ async function saveProgress(studentId, problemId, score) {
         console.error("❌ Lỗi khi lưu tiến trình:", error);
     }
 }
+
 
 // Chuyển đổi ảnh thành Base64
 function getBase64(file) {
