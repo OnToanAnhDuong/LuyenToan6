@@ -122,9 +122,10 @@ const loadProblems = async () => {
 
         const problems = await response.json();
 
-        // 🔹 Kiểm tra xem `problems` có hợp lệ không
+        // 🔹 Kiểm tra xem `problems` có phải là mảng không
         if (!problems || !Array.isArray(problems)) {
-            throw new Error("❌ API không trả về một mảng hợp lệ!");
+            console.error("❌ API không trả về một mảng hợp lệ! Dữ liệu nhận được:", problems);
+            throw new Error("API không trả về một danh sách bài tập hợp lệ.");
         }
 
         console.log("✅ Danh sách bài tập đã tải:", problems);
@@ -134,23 +135,6 @@ const loadProblems = async () => {
         alert("⚠ Không thể tải danh sách bài tập! Vui lòng thử lại.");
     }
 };
-const loadProgress = async (studentId) => {
-    try {
-        const response = await fetch(`/api/get-progress?studentId=${studentId}`);
-        if (!response.ok) {
-            throw new Error("Không thể tải tiến trình học sinh.");
-        }
-
-        progressData = await response.json() || {};
-        console.log(`✅ Tiến trình của học sinh ${studentId}:`, progressData);
-
-        updateProgressUI();
-        updateProblemColors(); // Cập nhật màu bài tập đã làm
-    } catch (error) {
-        console.error("❌ Lỗi khi tải tiến trình:", error);
-    }
-};
-
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
