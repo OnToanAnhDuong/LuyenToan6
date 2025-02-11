@@ -120,17 +120,10 @@ const loadProblems = async () => {
             throw new Error(`Lỗi API: ${response.status} - ${response.statusText}`);
         }
 
-        const data = await response.json();
-        console.log("📌 Dữ liệu API trả về:", data);
+        const problems = await response.json();
 
-        // Kiểm tra nếu API trả về object chứa key 'problems'
-        if (!data || (typeof data !== "object" && !Array.isArray(data))) {
-            throw new Error("❌ API trả về dữ liệu không hợp lệ!");
-        }
-
-        let problems = Array.isArray(data) ? data : data.problems;
-
-        if (!Array.isArray(problems)) {
+        // 🔹 Kiểm tra xem `problems` có hợp lệ không
+        if (!problems || !Array.isArray(problems)) {
             throw new Error("❌ API không trả về một mảng hợp lệ!");
         }
 
@@ -141,6 +134,23 @@ const loadProblems = async () => {
         alert("⚠ Không thể tải danh sách bài tập! Vui lòng thử lại.");
     }
 };
+const loadProgress = async (studentId) => {
+    try {
+        const response = await fetch(`/api/get-progress?studentId=${studentId}`);
+        if (!response.ok) {
+            throw new Error("Không thể tải tiến trình học sinh.");
+        }
+
+        progressData = await response.json() || {};
+        console.log(`✅ Tiến trình của học sinh ${studentId}:`, progressData);
+
+        updateProgressUI();
+        updateProblemColors(); // Cập nhật màu bài tập đã làm
+    } catch (error) {
+        console.error("❌ Lỗi khi tải tiến trình:", error);
+    }
+};
+
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
