@@ -184,7 +184,7 @@ async function saveProgress(studentId, problemId, score) {
 
         progressData.problemsDone = progressData.problemsDone || [];
 
-        if (!progressData.problemsDone.includes(problemId)) {
+        if (progressData.problemsDone.includes(Number(problemId))) {
             progressData.problemsDone.push(problemId);
             progressData.completedExercises = (progressData.completedExercises || 0) + 1;
             progressData.totalScore = (progressData.totalScore || 0) + score;
