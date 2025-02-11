@@ -186,50 +186,47 @@ async function saveProgress(studentId, problemId, score) {
             return;
         }
 
-        if (!progressData[studentId]) {
-            progressData[studentId] = {
-                completedExercises: 0,
-                totalScore: 0,
-                averageScore: 0,
-                problemsDone: []
-            };
+        progressData.problemsDone = progressData.problemsDone || [];
+
+        // Nếu bài tập chưa được thêm vào danh sách đã làm
+        if (!progressData.problemsDone.includes(Number(problemId))) {
+            progressData.problemsDone.push(Number(problemId));
+            progressData.completedExercises = (progressData.completedExercises || 0) + 1;
+            progressData.totalScore = (progressData.totalScore || 0) + score;
+            progressData.averageScore = progressData.totalScore / progressData.completedExercises;
         }
 
-        let studentProgress = progressData[studentId];
+        console.log("📌 Tiến trình cập nhật cục bộ:", progressData);
 
-        if (!studentProgress.problemsDone.includes(problemId)) {
-            studentProgress.problemsDone.push(problemId);
-            studentProgress.completedExercises++;
-            studentProgress.totalScore += score;
-            studentProgress.averageScore = studentProgress.totalScore / studentProgress.completedExercises;
-        }
+        const requestData = {
+            studentId: studentId,
+            problemId: problemId,
+            completedExercises: progressData.completedExercises || 0,
+            totalScore: progressData.totalScore || 0,
+            averageScore: progressData.averageScore || 0,
+            problemsDone: progressData.problemsDone || []
+        };
 
-        // 🔹 In ra console dữ liệu gửi lên API
-        console.log("📌 Dữ liệu gửi lên API:", JSON.stringify({
-            studentId,
-            problemId,
-            completedExercises: studentProgress.completedExercises,
-            totalScore: studentProgress.totalScore,
-            averageScore: studentProgress.averageScore,
-            problemsDone: studentProgress.problemsDone
-        }, null, 2));
+        console.log("📌 Gửi dữ liệu lên API:", JSON.stringify(requestData, null, 2));
 
         const response = await fetch("/api/save-progress", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                studentId,
-                problemId,
-                completedExercises: studentProgress.completedExercises,
-                totalScore: studentProgress.totalScore,
-                averageScore: studentProgress.averageScore,
-                problemsDone: studentProgress.problemsDone
-            })
+            body: JSON.stringify(requestData)
         });
 
         const result = await response.json();
         if (response.ok) {
             console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
+
+            // 🔄 Sau khi lưu, tải lại tiến trình ngay lập tức
+            await loadProgress(studentId);
+
+            // ⏳ Đợi 500ms rồi cập nhật màu bài tập
+            setTimeout(() => {
+                updateProblemColors();
+                updateProgressUI();
+            }, 500);
         } else {
             console.error(`❌ Lỗi cập nhật tiến trình (API Response):`, result);
         }
