@@ -160,18 +160,13 @@ function updateProblemColors() {
     console.log("📌 Đang cập nhật màu bài tập...");
     console.log("📌 Danh sách bài đã làm trước khi cập nhật màu:", progressData.problemsDone);
 
-    if (!progressData.problemsDone || !Array.isArray(progressData.problemsDone)) {
-        console.warn("⚠ `progressData.problemsDone` không tồn tại hoặc không phải mảng.");
+    if (!Array.isArray(progressData.problemsDone)) {
+        console.warn("⚠ `progressData.problemsDone` không phải là mảng hoặc chưa có dữ liệu.");
         return;
     }
 
     problemBoxes.forEach(box => {
-        let problemKey = `Bài ${box.dataset.id}`;  // 🆕 Chuyển dataset.id thành "Bài X"
-
-        if (!problemKey) {
-            console.warn("⚠ Không tìm thấy ID bài tập:", box);
-            return;
-        }
+        let problemKey = `Bài ${box.dataset.id}`;
 
         if (progressData.problemsDone.includes(problemKey)) {
             box.style.backgroundColor = "green";
