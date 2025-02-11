@@ -546,9 +546,16 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         // Hiển thị kết quả
         displayResult(response);
         // ✅ Cập nhật tiến trình sau khi chấm bài
+        console.log("🔄 Đang lưu tiến trình...");
         await saveProgress(studentId, currentProblem.index, response.score);
-        await loadProgress(studentId); // Cập nhật tiến trình sau khi lưu
-        updateProblemColors(); // Cập nhật màu bài tập
+        
+        // 🔄 Đợi 1 giây để đảm bảo dữ liệu đã được cập nhật
+        setTimeout(async () => {
+            console.log("🔄 Tải lại tiến trình sau khi lưu...");
+            await loadProgress(studentId);
+            updateProblemColors();
+            updateProgressUI();
+        }, 1000); // Đợi 1 giây
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
         document.getElementById("result").innerText = `❌ Lỗi: ${error.message}`;
