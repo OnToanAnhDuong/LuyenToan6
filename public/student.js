@@ -143,16 +143,27 @@ async function loadProgress(studentId) {
 function updateProblemColors() {
     const problemBoxes = document.querySelectorAll(".problem-box");
 
+    console.log("📌 Đang cập nhật màu bài tập...");
+    console.log("📌 Danh sách bài đã làm:", progressData.problemsDone);
+
     if (!progressData.problemsDone) {
         progressData.problemsDone = [];
     }
 
     problemBoxes.forEach(box => {
         const problemId = box.dataset.id;
+
+        if (!problemId) {
+            console.warn("⚠ Không tìm thấy ID bài tập:", box);
+            return;
+        }
+
         if (progressData.problemsDone.includes(problemId)) {
             box.style.backgroundColor = "green"; // Bài đã làm
+            console.log(`🟢 Đổi màu xanh: Bài ${problemId}`);
         } else {
             box.style.backgroundColor = "yellow"; // Bài chưa làm
+            console.log(`🟡 Đổi màu vàng: Bài ${problemId}`);
         }
     });
 }
@@ -530,9 +541,11 @@ if (!studentId) {
         return;
         }
         await saveProgress(studentId, currentProblem.index, response.score);
-        await loadProgress(studentId); // Cập nhật tiến trình sau khi lưu
-        updateProblemColors(); // Cập nhật màu bài tập
-        updateProgressUI(); // Cập nhật số bài đã làm và điểm trung bình
+        await loadProgress(studentId); // 🚀 Tải lại tiến trình để cập nhật màu bài tập
+        setTimeout(() => {
+            updateProblemColors(); // 🟢 Cập nhật màu bài tập ngay lập tức
+            updateProgressUI(); // 📊 Cập nhật số bài đã làm và điểm trung bình
+        }, 500); // Đợi 500ms để đảm bảo DOM đã cập nhật
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
         document.getElementById("result").innerText = `❌ Lỗi: ${error.message}`;
