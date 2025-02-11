@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const githubUrl = "https://raw.githubusercontent.com/ToanTHCS/LuyenToan6/main/data/progress.json";
+        const githubUrl = "https://raw.githubusercontent.com/OnToanAnhDuong/LuyenToan6/main/data/progress.json";
         const response = await fetch(githubUrl, { cache: "no-store" }); // ⚠ Tắt cache!
         if (!response.ok) throw new Error("Không thể tải JSON từ GitHub.");
 
