@@ -191,9 +191,10 @@ async function saveProgress(studentId, problemId, score) {
 
         progressData.problemsDone = progressData.problemsDone || [];
 
-        // Nếu bài tập chưa được thêm vào danh sách đã làm
-        if (!progressData.problemsDone.includes(Number(problemId))) {
-            progressData.problemsDone.push(Number(problemId));
+        let problemKey = `Bài ${problemId}`; // 🆕 Chuyển đổi problemId thành chuỗi "Bài X"
+
+        if (!progressData.problemsDone.includes(problemKey)) {
+            progressData.problemsDone.push(problemKey);
             progressData.completedExercises = (progressData.completedExercises || 0) + 1;
             progressData.totalScore = (progressData.totalScore || 0) + score;
             progressData.averageScore = progressData.totalScore / progressData.completedExercises;
@@ -203,13 +204,13 @@ async function saveProgress(studentId, problemId, score) {
 
         const requestData = {
             studentId: studentId,
-            problemId: problemId,
+            problemId: problemKey,  // 🆕 Lưu với format "Bài X"
             completedExercises: progressData.completedExercises || 0,
             totalScore: progressData.totalScore || 0,
             averageScore: progressData.averageScore || 0,
             problemsDone: progressData.problemsDone || []
         };
-
+    
         console.log("📌 Gửi dữ liệu lên API:", JSON.stringify(requestData, null, 2));
 
         const response = await fetch("/api/save-progress", {
@@ -221,15 +222,6 @@ async function saveProgress(studentId, problemId, score) {
         const result = await response.json();
         if (response.ok) {
             console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
-
-            // 🔄 Sau khi lưu, tải lại tiến trình ngay lập tức
-            await loadProgress(studentId);
-
-            // ⏳ Đợi 500ms rồi cập nhật màu bài tập
-            setTimeout(() => {
-                updateProblemColors();
-                updateProgressUI();
-            }, 500);
         } else {
             console.error(`❌ Lỗi cập nhật tiến trình (API Response):`, result);
         }
@@ -237,7 +229,6 @@ async function saveProgress(studentId, problemId, score) {
         console.error("❌ Lỗi khi lưu tiến trình:", error);
     }
 }
-
 
 // Chuyển đổi ảnh thành Base64
 function getBase64(file) {
