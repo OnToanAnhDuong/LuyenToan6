@@ -10,11 +10,12 @@
     ]
   },
   "HS002": {
-    "completedExercises": 1,
+    "completedExercises": 2,
     "totalScore": null,
     "averageScore": null,
     "problemsDone": [
-      "Bài 2"
+      "Bài 2",
+      1
     ]
   }
 }
