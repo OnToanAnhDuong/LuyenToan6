@@ -132,14 +132,22 @@ function displayProblem(problem) {
 async function loadProgress(studentId) {
     try {
         const response = await fetch(`/api/get-progress?studentId=${studentId}`);
-        const progress = await response.json();
-        progressData = progress || {}; // Lưu vào biến toàn cục
+        if (!response.ok) {
+            throw new Error("Không thể tải tiến trình học sinh.");
+        }
+
+        progressData = await response.json();
         console.log(`✅ Tiến trình của học sinh ${studentId}:`, progressData);
-        updateProgressUI();
+
+        if (!progressData.problemsDone) {
+            progressData.problemsDone = [];  // Đảm bảo không bị lỗi undefined
+        }
+
+        updateProgressUI();  
+        setTimeout(updateProblemColors, 500);  // ⏳ Chờ 500ms để đảm bảo dữ liệu cập nhật
     } catch (error) {
         console.error("❌ Lỗi khi tải tiến trình:", error);
     }
- updateProblemColors(); // Cập nhật màu sắc bài tập
 }
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
