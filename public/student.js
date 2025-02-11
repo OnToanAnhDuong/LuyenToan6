@@ -88,21 +88,39 @@ function displayProblemList(problems) {
     const problemContainer = document.getElementById("problemList");
     problemContainer.innerHTML = ""; // Xóa danh sách cũ nếu có
 
+    console.log("📌 Tổng số bài tập:", problems.length);
+    
     problems.forEach(problem => {
-        const problemBox = document.createElement("div");
-        problemBox.textContent = problem.index;
-        problemBox.className = "problem-box";
-        problemBox.dataset.id = problem.index;
+        console.log(`📝 Đang tạo bài tập: ${problem.index} - ${problem.problem}`);
 
-        function updateProblemColor() {
-            if (progressData[problem.index]) {
-                problemBox.style.backgroundColor = "green"; // Bài đã làm
-            } else {
-                problemBox.style.backgroundColor = "yellow"; // Bài chưa làm
-            }
+        const problemBox = document.createElement("div");
+        problemBox.textContent = `Bài ${problem.index}`;
+        problemBox.className = "problem-box";
+        problemBox.dataset.id = String(problem.index); // Chuyển thành string để so sánh đúng
+
+        // Kiểm tra xem bài tập này đã làm chưa
+        if (progressData.problemsDone && progressData.problemsDone.includes(problem.index)) {
+            problemBox.style.backgroundColor = "green"; // Bài đã làm
+            console.log(`🟢 Bài ${problem.index} đã làm`);
+        } else {
+            problemBox.style.backgroundColor = "yellow"; // Bài chưa làm
+            console.log(`🟡 Bài ${problem.index} chưa làm`);
         }
 
-        updateProblemColor();
+        problemBox.addEventListener("click", async () => {
+            if (progressData.problemsDone && progressData.problemsDone.includes(problem.index)) {
+                alert("📌 Bài tập này đã làm! Vui lòng chọn bài tập khác hoặc chọn bài tương tự.");
+                return;
+            }
+            displayProblem(problem); // Hiển thị nội dung bài tập
+        });
+
+        problemContainer.appendChild(problemBox);
+    });
+
+    console.log("✅ Danh sách bài tập đã cập nhật.");
+}
+
 
         problemBox.addEventListener("click", async () => {
             if (progressData[problem.index]) {
