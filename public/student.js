@@ -133,29 +133,34 @@ async function loadProgress(studentId) {
         progressData = progress || {}; // Lưu vào biến toàn cục
         console.log(`✅ Tiến trình của học sinh ${studentId}:`, progressData);
         updateProgressUI();
+        updateProblemColors(); // 🚀 Đảm bảo cập nhật màu bài tập sau khi tải tiến trình
     } catch (error) {
         console.error("❌ Lỗi khi tải tiến trình:", error);
     }
- updateProblemColors(); // Cập nhật màu sắc bài tập
 }
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
     const problemBoxes = document.querySelectorAll(".problem-box");
 
+    if (!progressData.problemsDone) {
+        progressData.problemsDone = [];
+    }
+
     problemBoxes.forEach(box => {
         const problemId = box.dataset.id;
-        if (progressData.problemsDone && progressData.problemsDone.includes(problemId)) {
+        if (progressData.problemsDone.includes(problemId)) {
             box.style.backgroundColor = "green"; // Bài đã làm
         } else {
             box.style.backgroundColor = "yellow"; // Bài chưa làm
         }
     });
 }
+
 // Cập nhật tiến trình UI
 function updateProgressUI() {
     document.getElementById("completedExercises").textContent = progressData.completedExercises || 0;
-    document.getElementById("averageScore").textContent = progressData.averageScore || 0;
+    document.getElementById("averageScore").textContent = (progressData.averageScore || 0).toFixed(2);
 }
 
 // Lưu tiến trình học sinh vào `progress.json`
@@ -166,45 +171,23 @@ async function saveProgress(studentId, problemId, score) {
             return;
         }
 
-        if (!progressData[studentId]) {
-            progressData[studentId] = {
-                completedExercises: 0,
-                totalScore: 0,
-                averageScore: 0,
-                problemsDone: []
-            };
+        if (!progressData.problemsDone) {
+            progressData.problemsDone = [];
         }
 
-        let studentProgress = progressData[studentId];
-
-        if (!studentProgress.problemsDone.includes(problemId)) {
-            studentProgress.problemsDone.push(problemId);
-            studentProgress.completedExercises++;
-            studentProgress.totalScore += score;
-            studentProgress.averageScore = studentProgress.totalScore / studentProgress.completedExercises;
+        if (!progressData.problemsDone.includes(problemId)) {
+            progressData.problemsDone.push(problemId);
+            progressData.completedExercises = (progressData.completedExercises || 0) + 1;
+            progressData.totalScore = (progressData.totalScore || 0) + score;
+            progressData.averageScore = progressData.totalScore / progressData.completedExercises;
         }
 
-        // 🔹 In ra console dữ liệu gửi lên API
-        console.log("📌 Dữ liệu gửi lên API:", JSON.stringify({
-            studentId,
-            problemId,
-            completedExercises: studentProgress.completedExercises,
-            totalScore: studentProgress.totalScore,
-            averageScore: studentProgress.averageScore,
-            problemsDone: studentProgress.problemsDone
-        }, null, 2));
+        console.log("📌 Tiến trình cập nhật cục bộ:", progressData);
 
         const response = await fetch("/api/save-progress", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                studentId,
-                problemId,
-                completedExercises: studentProgress.completedExercises,
-                totalScore: studentProgress.totalScore,
-                averageScore: studentProgress.averageScore,
-                problemsDone: studentProgress.problemsDone
-            })
+            body: JSON.stringify(progressData)
         });
 
         const result = await response.json();
@@ -531,6 +514,7 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         await saveProgress(studentId, currentProblem.index, response.score);
         await loadProgress(studentId); // Cập nhật tiến trình sau khi lưu
         updateProblemColors(); // Cập nhật màu bài tập
+        updateProgressUI(); // Cập nhật số bài đã làm và điểm trung bình
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
         document.getElementById("result").innerText = `❌ Lỗi: ${error.message}`;
