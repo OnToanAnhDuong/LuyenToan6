@@ -196,7 +196,7 @@ async function saveProgress(studentId, problemId, score) {
 
         progressData.problemsDone = progressData.problemsDone || [];
 
-        // 🔹 Đảm bảo tất cả bài tập được lưu dạng `"Bài X"`
+        // 🔹 Đảm bảo bài tập lưu dưới dạng "Bài X"
         let problemKey = `Bài ${problemId}`;
         if (!progressData.problemsDone.includes(problemKey)) {
             progressData.problemsDone.push(problemKey);
@@ -207,7 +207,7 @@ async function saveProgress(studentId, problemId, score) {
 
         const requestData = {
             studentId: studentId,
-            problemId: problemKey,  // 🆕 Đảm bảo lưu dạng `"Bài X"`
+            problemId: problemKey,
             completedExercises: progressData.completedExercises || 0,
             totalScore: progressData.totalScore || 0,
             averageScore: progressData.averageScore || 0,
@@ -226,12 +226,10 @@ async function saveProgress(studentId, problemId, score) {
         if (response.ok) {
             console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
 
-            // 🔄 Đợi 1 giây trước khi tải lại dữ liệu
+            // 🔄 Đợi 1 giây trước khi tải lại dữ liệu để tránh lỗi cache
             setTimeout(() => {
                 console.log("🔄 Tải lại tiến trình sau khi lưu...");
-                loadProgress(studentId);
-                updateProblemColors();
-                updateProgressUI();
+                loadProgress(studentId, true); // 🆕 Thêm tham số để buộc tải dữ liệu mới
             }, 1000);
         } else {
             console.error(`❌ Lỗi cập nhật tiến trình (API Response):`, result);
@@ -240,7 +238,6 @@ async function saveProgress(studentId, problemId, score) {
         console.error("❌ Lỗi khi lưu tiến trình:", error);
     }
 }
-
 
 // Chuyển đổi ảnh thành Base64
 function getBase64(file) {
