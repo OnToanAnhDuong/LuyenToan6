@@ -68,34 +68,6 @@ const loadStudentData = async (studentId) => {
     }
 };
 
-// Hàm tải danh sách bài tập từ `problems.json`
-const loadProblems = async () => {
-    try {
-        console.log("🔄 Đang tải danh sách bài tập...");
-
-        const response = await fetch('/api/get-problems');
-        if (!response.ok) {
-            throw new Error(`Lỗi API: ${response.status} - ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log("📌 Dữ liệu API trả về:", data);
-
-        // Kiểm tra nếu API trả về object có key 'problems'
-        const problems = Array.isArray(data) ? data : data.problems;
-
-        if (!Array.isArray(problems)) {
-            throw new Error("❌ API không trả về một mảng hợp lệ!");
-        }
-
-        console.log("✅ Danh sách bài tập đã tải:", problems);
-        displayProblemList(problems);
-    } catch (error) {
-        console.error("❌ Lỗi khi tải danh sách bài tập:", error);
-        alert("⚠ Không thể tải danh sách bài tập! Vui lòng thử lại.");
-    }
-};
-
 // Hiển thị danh sách bài tập
 function displayProblemList(problems) {
     const problemContainer = document.getElementById("problemList");
