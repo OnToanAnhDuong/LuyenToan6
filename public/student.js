@@ -198,27 +198,23 @@ async function saveProgress(studentId, problemId, score) {
 
         progressData.problemsDone = progressData.problemsDone || [];
 
-        let problemKey = `Bài ${problemId}`; // 🆕 Chuyển đổi problemId thành chuỗi "Bài X"
-
-        if (!progressData.problemsDone.includes(problemKey)) {
-            progressData.problemsDone.push(problemKey);
+        if (!progressData.problemsDone.includes(problemId)) {
+            progressData.problemsDone.push(problemId);
             progressData.completedExercises = (progressData.completedExercises || 0) + 1;
             progressData.totalScore = (progressData.totalScore || 0) + score;
             progressData.averageScore = progressData.totalScore / progressData.completedExercises;
         }
 
-        console.log("📌 Tiến trình cập nhật cục bộ:", progressData);
-
         const requestData = {
             studentId: studentId,
-            problemId: problemKey,  // 🆕 Lưu với format "Bài X"
+            problemId: problemId,
             completedExercises: progressData.completedExercises || 0,
             totalScore: progressData.totalScore || 0,
             averageScore: progressData.averageScore || 0,
             problemsDone: progressData.problemsDone || []
         };
-    
-        console.log("📌 Gửi dữ liệu lên API:", JSON.stringify(requestData, null, 2));
+
+        console.log("📌 Gửi dữ liệu lên API save-progress:", JSON.stringify(requestData, null, 2));
 
         const response = await fetch("/api/save-progress", {
             method: "POST",
@@ -229,6 +225,14 @@ async function saveProgress(studentId, problemId, score) {
         const result = await response.json();
         if (response.ok) {
             console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
+
+            // 🔄 Đợi 1 giây trước khi tải lại dữ liệu để tránh lỗi 404
+            setTimeout(() => {
+                console.log("🔄 Tải lại tiến trình sau khi lưu...");
+                loadProgress(studentId);
+                updateProblemColors();
+                updateProgressUI();
+            }, 1000);
         } else {
             console.error(`❌ Lỗi cập nhật tiến trình (API Response):`, result);
         }
