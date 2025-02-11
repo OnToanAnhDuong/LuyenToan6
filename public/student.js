@@ -78,7 +78,11 @@ const loadProblems = async () => {
             throw new Error(`Lỗi API: ${response.status} - ${response.statusText}`);
         }
 
-        const problems = await response.json();
+        const data = await response.json();
+        console.log("📌 Dữ liệu API trả về:", data);
+
+        // Kiểm tra nếu API trả về object có key 'problems'
+        const problems = Array.isArray(data) ? data : data.problems;
 
         if (!Array.isArray(problems)) {
             throw new Error("❌ API không trả về một mảng hợp lệ!");
@@ -91,7 +95,6 @@ const loadProblems = async () => {
         alert("⚠ Không thể tải danh sách bài tập! Vui lòng thử lại.");
     }
 };
-
 
 // Hiển thị danh sách bài tập
 function displayProblemList(problems) {
