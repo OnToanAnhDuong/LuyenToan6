@@ -8,5 +8,13 @@
       "Bài 2",
       "Bài 3"
     ]
+  },
+  "HS002": {
+    "completedExercises": 1,
+    "totalScore": 0,
+    "averageScore": 0,
+    "problemsDone": [
+      "Bài 1"
+    ]
   }
 }
