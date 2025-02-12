@@ -1,31 +1,61 @@
 
 export default async function handler(req, res) {
-    const { studentId } = req.query;
-    
-    if (!studentId) {
-        return res.status(400).json({ error: "Thiếu studentId" });
+    if (req.method !== "POST") {
+        return res.status(405).json({ error: "Method Not Allowed" });
+    }
+
+    const { studentId, problemId, completedExercises, totalScore, averageScore, problemsDone } = req.body;
+    if (!studentId || !problemId) {
+        return res.status(400).json({ error: "Thiếu thông tin bắt buộc." });
     }
 
     try {
-        const githubUrl = `https://raw.githubusercontent.com/OnToanAnhDuong/LuyenToan6/main/data/progress.json`;
-        
-        // ⚠ Tắt cache của trình duyệt và Vercel
-        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-        res.setHeader("Pragma", "no-cache");
-        res.setHeader("Expires", "0");
-
-        console.log("📡 Đang tải dữ liệu từ GitHub JSON...");
-        
-        const response = await fetch(githubUrl, { cache: "no-store" }); // 🚀 Tắt cache!
+        // 🔹 Lấy JSON hiện tại từ GitHub
+        const githubUrl = "https://raw.githubusercontent.com/OnToanAnhDuong/LuyenToan6/main/data/progress.json";
+        const response = await fetch(githubUrl, { cache: "no-store" });
         if (!response.ok) throw new Error("Không thể tải JSON từ GitHub.");
 
-        const allProgress = await response.json();
-        const studentProgress = allProgress[studentId] || { completedExercises: 0, totalScore: 0, averageScore: 0, problemsDone: [] };
+        let allProgress = await response.json();
+        
+        // 🔄 Cập nhật tiến trình học sinh
+        allProgress[studentId] = {
+            completedExercises,
+            totalScore,
+            averageScore,
+            problemsDone
+        };
 
-        console.log(`✅ Tiến trình mới nhất của ${studentId}:`, studentProgress);
-        res.status(200).json(studentProgress);
+        // 📌 Ghi lại JSON lên GitHub
+        const githubApiUrl = "https://api.github.com/repos/OnToanAnhDuong/LuyenToan6/contents/data/progress.json";
+        const githubToken = process.env.GITHUB_TOKEN;  // 🔑 Lấy token từ biến môi trường
+
+        // Lấy SHA của file hiện tại
+        const fileResponse = await fetch(githubApiUrl, {
+            headers: { Authorization: `token ${githubToken}` }
+        });
+        const fileData = await fileResponse.json();
+        const sha = fileData.sha;  // 🔑 Cần SHA để ghi đè file
+
+        // 📝 Cập nhật file trên GitHub
+        const updateResponse = await fetch(githubApiUrl, {
+            method: "PUT",
+            headers: {
+                Authorization: `token ${githubToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: `Cập nhật tiến trình học sinh ${studentId}`,
+                content: Buffer.from(JSON.stringify(allProgress, null, 2)).toString("base64"),
+                sha
+            })
+        });
+
+        if (!updateResponse.ok) throw new Error("Lỗi khi cập nhật JSON lên GitHub.");
+        
+        console.log(`✅ Cập nhật tiến trình thành công:`, allProgress[studentId]);
+        res.status(200).json({ message: "Cập nhật thành công!", progress: allProgress[studentId] });
     } catch (error) {
-        console.error("❌ Lỗi khi lấy tiến trình:", error);
+        console.error("❌ Lỗi khi lưu tiến trình:", error);
         res.status(500).json({ error: error.message });
     }
 }
