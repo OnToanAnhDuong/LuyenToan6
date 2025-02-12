@@ -1,3 +1,4 @@
+
 let currentKeyIndex = 0;  // Biến để theo dõi API key đang sử dụng
 let base64Image = ""; // Biến toàn cục để lưu ảnh bài làm
 let progressData = {}; // Biến lưu tiến trình học sinh
@@ -39,9 +40,7 @@ async function initStudentPage() {
     console.log(`🔹 Đang tải dữ liệu học sinh: ${studentId}`);
     await loadStudentData(studentId);
     await loadProblems();
-    await loadProgress(studentId);
-    updateProblemColors(); // Cập nhật màu bài tập đã làm
-    
+    await loadProgress(studentId);     
     console.log("✅ Trang học sinh đã khởi tạo hoàn tất!");
 }
 
@@ -82,7 +81,6 @@ const loadProblems = async () => {
         console.error("❌ Lỗi khi tải danh sách bài tập:", error);
     }
 };
-
 // Hiển thị danh sách bài tập
 function displayProblemList(problems) {
     const problemContainer = document.getElementById("problemList");
@@ -129,33 +127,35 @@ function displayProblem(problem) {
 }
 
 // Tải tiến trình học sinh
-async function loadProgress(studentId, forceReload = false) {
+let isLoadingProgress = false; // 🆕 Biến kiểm soát trạng thái tải tiến trình
+
+async function loadProgress(studentId) {
     try {
-        console.log(`🔹 Đang tải tiến trình cho học sinh: ${studentId}`);
+        console.log(`🔄 Đang tải tiến trình từ API cho học sinh: ${studentId}`);
 
-        // 🆕 Thêm timestamp để ngăn trình duyệt cache dữ liệu cũ
-        const url = `/api/get-progress?studentId=${studentId}&t=${new Date().getTime()}`;
+        // Thêm timestamp để đảm bảo lấy dữ liệu mới
+        const timestamp = new Date().getTime();
+        const response = await fetch(`/api/get-progress?studentId=${studentId}&t=${timestamp}`);
 
-        const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Không thể tải tiến trình (Mã lỗi: ${response.status})`);
+            throw new Error(`Lỗi API: ${response.status} - ${response.statusText}`);
         }
 
         const progress = await response.json();
+        console.log("✅ Dữ liệu tiến trình tải về:", progress);
+
         if (!progress || Object.keys(progress).length === 0) {
             throw new Error(`❌ Không tìm thấy tiến trình của học sinh ${studentId}.`);
         }
 
         progressData = progress;
-        console.log(`✅ Tiến trình của học sinh ${studentId}:`, progressData);
-
         updateProgressUI();
         updateProblemColors();
     } catch (error) {
         console.error("❌ Lỗi khi tải tiến trình:", error);
-        alert("⚠ Không thể tải tiến trình học sinh! Hãy kiểm tra lại dữ liệu.");
     }
 }
+
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
@@ -200,8 +200,9 @@ async function saveProgress(studentId, problemId, score) {
 
         progressData.problemsDone = progressData.problemsDone || [];
 
-        // 🔹 Đảm bảo bài tập lưu dưới dạng "Bài X"
+        // 🔹 Đảm bảo lưu dữ liệu theo dạng "Bài X"
         let problemKey = `Bài ${problemId}`;
+
         if (!progressData.problemsDone.includes(problemKey)) {
             progressData.problemsDone.push(problemKey);
             progressData.completedExercises = (progressData.completedExercises || 0) + 1;
@@ -211,7 +212,7 @@ async function saveProgress(studentId, problemId, score) {
 
         const requestData = {
             studentId: studentId,
-            problemId: problemKey,
+            problemId: problemKey, // 🆕 Lưu theo dạng "Bài X"
             completedExercises: progressData.completedExercises || 0,
             totalScore: progressData.totalScore || 0,
             averageScore: progressData.averageScore || 0,
@@ -229,12 +230,8 @@ async function saveProgress(studentId, problemId, score) {
         const result = await response.json();
         if (response.ok) {
             console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
-
-            // 🔄 Đợi 1 giây trước khi tải lại dữ liệu để tránh lỗi cache
-            setTimeout(() => {
-                console.log("🔄 Tải lại tiến trình sau khi lưu...");
-                loadProgress(studentId, true); // 🆕 Thêm tham số để buộc tải dữ liệu mới
-            }, 1000);
+            
+           
         } else {
             console.error(`❌ Lỗi cập nhật tiến trình (API Response):`, result);
         }
@@ -559,9 +556,8 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         setTimeout(async () => {
             console.log("🔄 Tải lại tiến trình sau khi lưu...");
             await loadProgress(studentId);
-            updateProblemColors();
-            updateProgressUI();
-        }, 1000); // Đợi 1 giây
+            updateProgressUI();            
+        }, 5000); // Đợi 1 giây
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
         document.getElementById("result").innerText = `❌ Lỗi: ${error.message}`;
@@ -569,4 +565,8 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
         isGrading = false;
     }
 });
-
+ // 🔄 Đợi 1 giây rồi tải lại dữ liệu
+//setTimeout(async () => {
+//console.log("🔄 Tải lại tiến trình sau khi lưu...");
+//await loadProgress(studentId);
+           // }, 10000);
