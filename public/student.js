@@ -557,7 +557,7 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
             console.log("🔄 Tải lại tiến trình sau khi lưu...");
             await loadProgress(studentId);
             updateProgressUI();            
-        }, 5000); // Đợi 1 giây
+        }, 20000); // Đợi 1 giây
        } catch (error) {
         console.error("❌ Lỗi khi chấm bài:", error);
         document.getElementById("result").innerText = `❌ Lỗi: ${error.message}`;
