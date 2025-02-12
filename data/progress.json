@@ -6,9 +6,11 @@
     "problemsDone": []
   },
   "HS002": {
-    "completedExercises": 6,
+    "completedExercises": 7,
     "totalScore": 0,
     "averageScore": 0,
-    "problemsDone": []
+    "problemsDone": [
+      "Bài 1"
+    ]
   }
 }
