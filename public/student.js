@@ -153,16 +153,23 @@ async function loadProgress(studentId) {
     try {
         console.log(`🔄 Đang tải tiến trình từ Firebase cho học sinh: ${studentId}`);
 
-        const snapshot = await db.ref(`progress/${studentId}`).once("value");
-        const progress = snapshot.val() || {}; // Nếu không có dữ liệu, trả về object rỗng
+        // Đọc dữ liệu từ Firebase
+        const progressRef = db.ref(`progress/${studentId}`);
+        const snapshot = await progressRef.once("value");
 
-        console.log("✅ Dữ liệu tiến trình tải về từ Firebase:", progress);
-        
-        progressData = progress;
+        if (!snapshot.exists()) {
+            console.warn(`⚠ Không tìm thấy tiến trình của ${studentId}, tạo dữ liệu mới.`);
+            progressData = { completedExercises: 0, totalScore: 0, averageScore: 0, problemsDone: [] };
+            await progressRef.set(progressData);
+        } else {
+            progressData = snapshot.val();
+        }
+
+        console.log("✅ Dữ liệu tiến trình tải về:", progressData);
         updateProgressUI();
         updateProblemColors();
     } catch (error) {
-        console.error("❌ Lỗi khi tải tiến trình từ Firebase:", error);
+        console.error("❌ Lỗi khi tải tiến trình:", error);
     }
 }
 
