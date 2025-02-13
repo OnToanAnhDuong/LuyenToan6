@@ -145,31 +145,20 @@ let isLoadingProgress = false; // 🆕 Biến kiểm soát trạng thái tải t
 
 async function loadProgress(studentId) {
     try {
-        console.log(`🔄 Đang tải tiến trình từ API cho học sinh: ${studentId}`);
+        console.log(`🔄 Đang tải tiến trình từ Firebase cho học sinh: ${studentId}`);
 
-        // Thêm timestamp để đảm bảo lấy dữ liệu mới
-        const timestamp = new Date().getTime();
-        const response = await fetch(`/api/get-progress?studentId=${studentId}&t=${timestamp}`);
+        const snapshot = await db.ref(`progress/${studentId}`).once("value");
+        const progress = snapshot.val() || {}; // Nếu không có dữ liệu, trả về object rỗng
 
-        if (!response.ok) {
-            throw new Error(`Lỗi API: ${response.status} - ${response.statusText}`);
-        }
-
-        const progress = await response.json();
-        console.log("✅ Dữ liệu tiến trình tải về:", progress);
-
-        if (!progress || Object.keys(progress).length === 0) {
-            throw new Error(`❌ Không tìm thấy tiến trình của học sinh ${studentId}.`);
-        }
-
+        console.log("✅ Dữ liệu tiến trình tải về từ Firebase:", progress);
+        
         progressData = progress;
         updateProgressUI();
         updateProblemColors();
     } catch (error) {
-        console.error("❌ Lỗi khi tải tiến trình:", error);
+        console.error("❌ Lỗi khi tải tiến trình từ Firebase:", error);
     }
 }
-
 
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
