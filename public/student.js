@@ -1,4 +1,18 @@
+// ✅ Cấu hình Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyDO95ccGCuaIGTyGeQ5oh3ho1H6mTN7upU",
+    authDomain: "chuong-123.firebaseapp.com",
+    databaseURL: "https://chuong-123-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "chuong-123",
+    storageBucket: "chuong-123.firebasestorage.app",
+    messagingSenderId: "261814561451",
+    appId: "1:261814561451:web:324d304e75ba126dc065ee",
+    measurementId: "G-P9G5EQWKHY"
+};
 
+// ✅ Khởi tạo Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 let currentKeyIndex = 0;  // Biến để theo dõi API key đang sử dụng
 let base64Image = ""; // Biến toàn cục để lưu ảnh bài làm
 let progressData = {}; // Biến lưu tiến trình học sinh
