@@ -3,9 +3,8 @@ if (!firebase?.apps?.length) {
     console.error("❌ Firebase chưa được khởi tạo! Vui lòng kiểm tra index.html.");
 }
 
-// Truy cập Database
+// Truy cập Database Firebase
 const db = firebase.database();
-
 let currentKeyIndex = 0;  // Biến để theo dõi API key đang sử dụng
 let base64Image = ""; // Biến toàn cục để lưu ảnh bài làm
 let progressData = {}; // Biến lưu tiến trình học sinh
@@ -200,7 +199,7 @@ async function saveProgress(studentId, problemId, score) {
             return;
         }
 
-        // Đọc tiến trình hiện tại
+        // Lấy tiến trình hiện tại
         const progressRef = db.ref(`progress/${studentId}`);
         const snapshot = await progressRef.once("value");
         let progressData = snapshot.val() || {
@@ -230,7 +229,6 @@ async function saveProgress(studentId, problemId, score) {
         console.error("❌ Lỗi khi lưu tiến trình:", error);
     }
 }
-
 
 // Chuyển đổi ảnh thành Base64
 function getBase64(file) {
