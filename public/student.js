@@ -207,33 +207,34 @@ async function saveProgress(studentId, problemId, score) {
             return;
         }
 
-        progressData.problemsDone = progressData.problemsDone || [];
+        // Đọc tiến trình hiện tại
+        const progressRef = db.ref(`progress/${studentId}`);
+        const snapshot = await progressRef.once("value");
+        let progressData = snapshot.val() || {
+            completedExercises: 0,
+            totalScore: 0,
+            averageScore: 0,
+            problemsDone: []
+        };
 
+        // Cập nhật tiến trình
         let problemKey = `Bài ${problemId}`;
-
         if (!progressData.problemsDone.includes(problemKey)) {
             progressData.problemsDone.push(problemKey);
-            progressData.completedExercises = (progressData.completedExercises || 0) + 1;
-            progressData.totalScore = (progressData.totalScore || 0) + score;
+            progressData.completedExercises += 1;
+            progressData.totalScore += score;
             progressData.averageScore = progressData.totalScore / progressData.completedExercises;
         }
 
-        // 🔹 Lưu tiến trình vào Firebase
-        await db.ref(`progress/${studentId}`).set({
-            completedExercises: progressData.completedExercises || 0,
-            totalScore: progressData.totalScore || 0,
-            averageScore: progressData.averageScore || 0,
-            problemsDone: progressData.problemsDone || []
-        });
+        // Ghi dữ liệu lên Firebase
+        await progressRef.set(progressData);
+        console.log(`✅ Tiến trình đã lưu thành công:`, progressData);
 
-        console.log(`✅ Cập nhật tiến trình thành công cho ${studentId} trên Firebase`);
-
-        setTimeout(async () => {
-            console.log("🔄 Tải lại tiến trình sau khi lưu...");
-            await loadProgress(studentId);
-        }, 1000);
+        // Cập nhật UI sau khi lưu
+        updateProgressUI();
+        updateProblemColors();
     } catch (error) {
-        console.error("❌ Lỗi khi lưu tiến trình lên Firebase:", error);
+        console.error("❌ Lỗi khi lưu tiến trình:", error);
     }
 }
 
