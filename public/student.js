@@ -1,9 +1,18 @@
-// 🛑 Kiểm tra Firebase đã được load chưa
-if (!firebase?.apps?.length) {
-    console.error("❌ Firebase chưa được khởi tạo! Vui lòng kiểm tra index.html.");
-}
+// Khởi tạo Firebase (thay bằng thông tin của bạn)
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    databaseURL: "YOUR_DATABASE_URL",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
 
-// Truy cập Database Firebase
+// Khởi tạo Firebase App
+firebase.initializeApp(firebaseConfig);
+
+// Tham chiếu đến Database
 const db = firebase.database();
 let currentKeyIndex = 0;  // Biến để theo dõi API key đang sử dụng
 let base64Image = ""; // Biến toàn cục để lưu ảnh bài làm
