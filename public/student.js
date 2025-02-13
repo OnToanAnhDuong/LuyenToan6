@@ -1,19 +1,6 @@
-// ⚡ Kiểm tra Firebase đã được load chưa
+// 🛑 Kiểm tra Firebase đã được load chưa
 if (!firebase?.apps?.length) {
-    const firebaseConfig = {
-        apiKey: "AIzaSyDO95ccGCuaIGTyGeQ5oh3ho1H6mTN7upU",
-        authDomain: "chuong-123.firebaseapp.com",
-        databaseURL: "https://chuong-123-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "chuong-123",
-        storageBucket: "chuong-123.appspot.com",
-        messagingSenderId: "261814561451",
-        appId: "1:261814561451:web:324d304e75ba126dc065ee",
-        measurementId: "G-P9G5EQWKHY"
-    };
-
-    // Khởi tạo Firebase
-    firebase.initializeApp(firebaseConfig);
-    console.log("✅ Firebase đã khởi tạo!");
+    console.error("❌ Firebase chưa được khởi tạo! Vui lòng kiểm tra index.html.");
 }
 
 // Truy cập Database
