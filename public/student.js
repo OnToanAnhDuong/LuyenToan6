@@ -203,7 +203,6 @@ async function saveProgress(studentId, problemId, score) {
 
         progressData.problemsDone = progressData.problemsDone || [];
 
-        // 🔹 Đảm bảo lưu dữ liệu theo dạng "Bài X"
         let problemKey = `Bài ${problemId}`;
 
         if (!progressData.problemsDone.includes(problemKey)) {
@@ -213,35 +212,25 @@ async function saveProgress(studentId, problemId, score) {
             progressData.averageScore = progressData.totalScore / progressData.completedExercises;
         }
 
-        const requestData = {
-            studentId: studentId,
-            problemId: problemKey, // 🆕 Lưu theo dạng "Bài X"
+        // 🔹 Lưu tiến trình vào Firebase
+        await db.ref(`progress/${studentId}`).set({
             completedExercises: progressData.completedExercises || 0,
             totalScore: progressData.totalScore || 0,
             averageScore: progressData.averageScore || 0,
             problemsDone: progressData.problemsDone || []
-        };
-
-        console.log("📌 Gửi dữ liệu lên API save-progress:", JSON.stringify(requestData, null, 2));
-
-        const response = await fetch("/api/save-progress", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestData)
         });
 
-        const result = await response.json();
-        if (response.ok) {
-            console.log(`✅ Tiến trình của ${studentId} đã được cập nhật:`, result);
-            
-           
-        } else {
-            console.error(`❌ Lỗi cập nhật tiến trình (API Response):`, result);
-        }
+        console.log(`✅ Cập nhật tiến trình thành công cho ${studentId} trên Firebase`);
+
+        setTimeout(async () => {
+            console.log("🔄 Tải lại tiến trình sau khi lưu...");
+            await loadProgress(studentId);
+        }, 1000);
     } catch (error) {
-        console.error("❌ Lỗi khi lưu tiến trình:", error);
+        console.error("❌ Lỗi khi lưu tiến trình lên Firebase:", error);
     }
 }
+
 
 // Chuyển đổi ảnh thành Base64
 function getBase64(file) {
