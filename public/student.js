@@ -1,12 +1,13 @@
 // Khởi tạo Firebase (thay bằng thông tin của bạn)
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    databaseURL: "YOUR_DATABASE_URL",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDO95ccGCuaIGTyGeQ5oh3ho1H6mTN7upU",
+        authDomain: "chuong-123.firebaseapp.com",
+        databaseURL: "https://chuong-123-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "chuong-123",
+        storageBucket: "chuong-123.appspot.com",
+        messagingSenderId: "261814561451",
+        appId: "1:261814561451:web:324d304e75ba126dc065ee",
+        measurementId: "G-P9G5EQWKHY"
 };
 
 // Khởi tạo Firebase App
