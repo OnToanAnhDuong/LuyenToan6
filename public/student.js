@@ -159,7 +159,6 @@ async function loadProgress(studentId) {
         console.error("❌ Lỗi khi tải tiến trình:", error);
     }
 }
-
 // ✅ Cập nhật màu sắc bài tập dựa trên tiến trình học sinh
 function updateProblemColors() {
     const problemBoxes = document.querySelectorAll(".problem-box");
